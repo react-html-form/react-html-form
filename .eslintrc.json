@@ -3,5 +3,16 @@
     "airbnb",
     "plugin:prettier/recommended",
     "plugin:react/recommended"
-  ]
+  ],
+  "plugins": ["react"],
+  "rules": {
+    "react/jsx-filename-extension": 0,
+    "react/destructuring-assignment": 0,
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": [".storybook/**", "stories/**"]
+      }
+    ]
+  }
 }

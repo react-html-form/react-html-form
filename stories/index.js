@@ -1,6 +1,6 @@
-import Form from "../src/index.js";
 import React from "react";
 import { storiesOf } from "@storybook/react";
+import Form from "../src";
 
 class ProofOfConcept extends React.Component {
   constructor(props) {
