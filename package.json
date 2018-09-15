@@ -1,4 +1,14 @@
 {
   "name": "react-html-form",
-  "version": "0.0.0"
+  "version": "0.0.0",
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^7.1.2",
+    "@commitlint/config-angular": "^7.1.2",
+    "husky": "^1.0.0-rc.14"
+  }
 }
