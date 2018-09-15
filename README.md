@@ -18,6 +18,10 @@ We keep our API surface small by pulling form state (values and errors) directly
 
 ---
 
+## Credits
+
+- Logomark via [align](https://thenounproject.com/search/?q=react-html-form&i=468358) by Chameleon Design from the Noun Project
+
 ## Footnotes:
 
 1: https://reactjs.org/docs/forms.html
