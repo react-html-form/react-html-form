@@ -1,4 +1,4 @@
-# react-html-form
+# <img src='./assets/logo.jpg' width="344" alt='react-html-form' />
 
 > The simplest form component for React
 
