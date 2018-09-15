@@ -12,7 +12,7 @@ Our mission is to build a great developer experience around forms. We let you ma
 
 Other React form libraries introduce patterns that aren’t very ergonomic or have a large API surface. They often require the user to build their own input primitives that are tightly coupled to the library. Even more, they usually require the user to bring their own validation, something the browser actually offers for free!
 
-## How react-final-form is different
+## How react-html-form is different
 
 We keep our API surface small by pulling form state (values and errors) directly out of the DOM through the `HTMLFormElement` interface.
 
