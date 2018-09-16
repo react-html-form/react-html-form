@@ -99,22 +99,39 @@ class Form extends React.Component {
   handleChange(event) {
     this.props.onChange(event);
     this.props.onData(this.getFormState(), this.form);
+    this.props.onChangeWithData(
+      event,
+      { values: undefined, errors: undefined },
+      this.form
+    );
   }
 
   handleReset(event) {
     this.props.onReset(event);
     this.props.onData({ values: undefined, errors: undefined }, this.form);
+    this.props.onResetWithData(
+      event,
+      { values: undefined, errors: undefined },
+      this.form
+    );
   }
 
   handleSubmit(event) {
-    if (typeof this.props.onSubmit === "function") {
+    this.props.onSubmit(event);
+    if (typeof this.props.onSubmitWithData === "function") {
       event.preventDefault();
-      this.props.onSubmit(event, this.getFormState(), this.form);
+      this.props.onSubmitWithData(event, this.getFormState(), this.form);
     }
   }
 
   render() {
-    const { onData, ...rest } = this.props;
+    const {
+      onData,
+      onChangeWithData,
+      onResetWithData,
+      onSubmitWithData,
+      ...rest
+    } = this.props;
     return (
       <form
         {...rest}
@@ -134,12 +151,20 @@ class Form extends React.Component {
 
 Form.defaultProps = {
   onChange: () => {},
-  onReset: () => {}
+  onChangeWithData: () => {},
+  onReset: () => {},
+  onResetWithData: () => {},
+  onSubmit: () => {},
+  onSubmitWithData: () => {}
 };
 
 Form.propTypes = {
   onChange: PropTypes.func,
-  onReset: PropTypes.func
+  onChangeWithData: PropTypes.func,
+  onReset: PropTypes.func,
+  onResetWithData: PropTypes.func,
+  onSubmit: PropTypes.func,
+  onSubmitWithData: PropTypes.func
 };
 
 export default Form;

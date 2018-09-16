@@ -10,9 +10,9 @@ class ProofOfConcept extends React.Component {
     this.state = {};
   }
 
-  handleData(data) {
-    this.setState(data);
-    console.log(data);
+  handleData({ values, errors }) {
+    this.setState({ values, errors });
+    console.log({ values, errors });
   }
 
   handleSubmit(event, { values, errors }, form) {
@@ -27,7 +27,7 @@ class ProofOfConcept extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <Form onData={this.handleData} onSubmit={this.handleSubmit}>
+        <Form onData={this.handleData} onSubmitWithData={this.handleSubmit}>
           <p>
             <label htmlFor="name">Customer name:</label>
             <input name="name" id="name" type="text" />
