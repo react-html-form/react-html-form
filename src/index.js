@@ -13,13 +13,25 @@ class Form extends React.Component {
     const errors = {};
 
     for (let i = 0; i < this.form.elements.length; i += 1) {
-      // Check for the name since not all elements have values (like <fieldset />)
+      const element = this.form.elements[i];
+
+      // Check for the name since not all form.elements have name's (like <fieldset />)
+      // Otherwise, this would result in empty string keys: `{ name: "example", "": ""}`
       if (this.form.elements[i].name) {
-        values[this.form.elements[i].name] = this.form.elements[i].value;
-        if (this.form.elements[i].validationMessage.length > 0) {
-          errors[this.form.elements[i].name] = this.form.elements[
-            i
-          ].validationMessage;
+        switch (element.type) {
+          case "radio":
+            if (element.checked) {
+              values[element.name] = element.value;
+            }
+            if (element.validationMessage.length > 0) {
+              errors[element.name] = element.validationMessage;
+            }
+            break;
+          default:
+            values[element.name] = element.value;
+            if (element.validationMessage.length > 0) {
+              errors[element.name] = this.form.elements[i].validationMessage;
+            }
         }
       }
     }
