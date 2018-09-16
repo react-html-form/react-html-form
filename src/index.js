@@ -21,36 +21,38 @@ class Form extends React.Component {
       }
 
       // Save the value
-      switch (element.type) {
-        case "fieldset":
-          // no-op
-          break;
-        case "radio":
-          if (element.checked) {
-            values[element.name] = element.value;
-          }
-          break;
-        case "checkbox":
-          if (!values[element.name]) {
+      if (element.name) {
+        switch (element.type) {
+          case "fieldset":
+            // no-op
+            break;
+          case "radio":
             if (element.checked) {
-              values[element.name] =
-                element.value === "on" ? true : element.value;
+              values[element.name] = element.value;
+            }
+            break;
+          case "checkbox":
+            if (!values[element.name]) {
+              if (element.checked) {
+                values[element.name] =
+                  element.value === "on" ? true : element.value;
+              } else {
+                values[element.name] = false;
+              }
             } else {
-              values[element.name] = false;
+              // Convert to an array of values since we're probably in a fieldset
+              // (Or at least, the user has declared multiple checkboxes with the same name)
+              if (!Array.isArray(values[element.name])) {
+                values[element.name] = new Array(values[element.name]);
+              }
+              if (element.checked) {
+                values[element.name].push(element.value);
+              }
             }
-          } else {
-            // Convert to an array of values since we're probably in a fieldset
-            // (Or at least, the user has declared multiple checkboxes with the same name)
-            if (!Array.isArray(values[element.name])) {
-              values[element.name] = new Array(values[element.name]);
-            }
-            if (element.checked) {
-              values[element.name].push(element.value);
-            }
-          }
-          break;
-        default:
-          values[element.name] = element.value;
+            break;
+          default:
+            values[element.name] = element.value;
+        }
       }
     }
 
