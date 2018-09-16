@@ -95,6 +95,9 @@ class ProofOfConcept extends React.Component {
           <p>
             <label htmlFor="delivery-time">Preferred delivery time:</label>
             <input
+              // uncomment the following lines - they work as expected
+              // data-valueasnumber
+              // data-valueasdate
               type="time"
               min="11:00"
               max="21:00"
@@ -120,10 +123,20 @@ class ProofOfConcept extends React.Component {
             </small>
           </p>
           <p>
+            <label htmlFor="breadsticks">Number of breadsticks</label>
+            <input
+              data-valueasnumber
+              type="number"
+              name="breadsticks"
+              id="breadsticks"
+            />
+          </p>
+          <p>
             <button type="submit" name="submit" value="Order my pizza!">
               Submit order
             </button>
           </p>
+          <input type="hidden" name="hidden" value={1234567890} />
         </Form>
         <p>Form state:</p>
         <pre>{JSON.stringify(this.state, null, 2)}</pre>

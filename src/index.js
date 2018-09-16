@@ -33,6 +33,8 @@ class Form extends React.Component {
           case "radio":
             if (element.checked) {
               values[element.name] = element.value;
+            } else if (element.indeterminate) {
+              values[element.name] = undefined;
             }
             break;
           case "checkbox":
@@ -40,6 +42,8 @@ class Form extends React.Component {
               if (element.checked) {
                 values[element.name] =
                   element.value === "on" ? true : element.value;
+              } else if (element.indeterminate) {
+                values[element.name] = undefined;
               } else {
                 values[element.name] = false;
               }
@@ -56,6 +60,16 @@ class Form extends React.Component {
             break;
           default:
             values[element.name] = element.value;
+        }
+
+        // Override our value in case the user has supplied `data-valueasdate` or 'data-valueasnumber` attribute
+        // Important, valueAsNumber should always override valueAsDate
+        // see https://www.w3.org/TR/2011/WD-html5-20110405/common-input-element-attributes.html
+        if (element.hasAttribute("data-valueasdate")) {
+          values[element.name] = element.valueAsDate;
+        }
+        if (element.hasAttribute("data-valueasnumber")) {
+          values[element.name] = element.valueAsNumber;
         }
       }
     }
