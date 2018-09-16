@@ -40,6 +40,23 @@ class ProofOfConcept extends React.Component {
             <label htmlFor="email">E-mail address:</label>
             <input required name="email" id="email" type="email" />
           </p>
+          <p>
+            {" "}
+            <label htmlFor="style">Variety:</label>
+            <input list="styles" name="style" />
+            <datalist id="styles">
+              <option value="Neapolitan" />
+              <option value="Sicilian" />
+              <option value="Argentine" />
+              <option value="Deep dish" />
+              <option value="Stuffed" />
+              <option value="Pocket" />
+              <option value="Turnover" />
+              <option value="Rolled" />
+              <option value="On a stick" />
+              <option value="Grilled" />
+            </datalist>
+          </p>
           <fieldset>
             <legend>Pizza Size</legend>
             <p>
