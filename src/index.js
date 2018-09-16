@@ -4,11 +4,12 @@ import React from "react";
 class Form extends React.Component {
   constructor(props) {
     super(props);
+    this.getFormState = this.getFormState.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleChange(event) {
-    this.props.onChange(event);
+  getFormState() {
     const values = {};
     const errors = {};
 
@@ -56,10 +57,22 @@ class Form extends React.Component {
       }
     }
 
-    const hasErrors =
-      Object.keys(errors).length !== 0 && errors.constructor === Object;
+    return {
+      values,
+      errors
+    };
+  }
 
-    this.props.onData({ values, errors, hasErrors });
+  handleChange(event) {
+    this.props.onChange(event);
+    this.props.onData(this.getFormState(), this.form);
+  }
+
+  handleSubmit(event) {
+    if (typeof this.props.onSubmit === "function") {
+      event.preventDefault();
+      this.props.onSubmit(event, this.getFormState(), this.form);
+    }
   }
 
   render() {
@@ -67,7 +80,9 @@ class Form extends React.Component {
     return (
       <form
         {...rest}
+        noValidate={!this.props.domValidation}
         onChange={this.handleChange}
+        onSubmit={this.handleSubmit}
         ref={c => {
           this.form = c;
         }}

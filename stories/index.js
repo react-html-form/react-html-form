@@ -6,17 +6,27 @@ class ProofOfConcept extends React.Component {
   constructor(props) {
     super(props);
     this.handleData = this.handleData.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
     this.state = {};
   }
 
-  handleData(data) {
-    this.setState(data);
+  handleData({ values, errors }) {
+    this.setState({ values, errors });
+  }
+
+  handleSubmit(event, { values, errors }, form) {
+    this.setState({ values, errors });
+    if (!form.reportValidity()) {
+      window.alert("form is invalid");
+    } else {
+      window.alert("form is valid");
+    }
   }
 
   render() {
     return (
       <React.Fragment>
-        <Form onData={this.handleData}>
+        <Form onData={this.handleData} onSubmit={this.handleSubmit}>
           <p>
             <label htmlFor="name">Customer name:</label>
             <input name="name" id="name" type="text" />
@@ -27,7 +37,7 @@ class ProofOfConcept extends React.Component {
           </p>
           <p>
             <label htmlFor="email">E-mail address:</label>
-            <input name="email" id="email" type="email" />
+            <input required name="email" id="email" type="email" />
           </p>
           <fieldset>
             <legend>Pizza Size</legend>
@@ -100,7 +110,9 @@ class ProofOfConcept extends React.Component {
             <textarea name="delivery-instructions" id="delivery-instructions" />
           </p>
           <p>
-            <button type="submit">Submit order</button>
+            <button type="submit" name="submit" value="Order my pizza!">
+              Submit order
+            </button>
           </p>
         </Form>
         <p>Form state:</p>
