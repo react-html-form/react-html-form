@@ -19,15 +19,15 @@ class ProofOfConcept extends React.Component {
         <Form onData={this.handleData}>
           <p>
             <label htmlFor="name">Customer name:</label>
-            <input required name="name" id="custname" type="text" />
+            <input name="name" id="name" type="text" />
           </p>
           <p>
             <label htmlFor="telephone">Telephone:</label>
-            <input required name="telephone" id="telephone" type="tel" />
+            <input name="telephone" id="telephone" type="tel" />
           </p>
           <p>
             <label htmlFor="email">E-mail address:</label>
-            <input required name="email" id="email" type="email" />
+            <input name="email" id="email" type="email" />
           </p>
           <fieldset>
             <legend>Pizza Size</legend>
@@ -73,6 +73,14 @@ class ProofOfConcept extends React.Component {
               />
             </p>
           </fieldset>
+          <p>
+            <label htmlFor="gluten-free-crust">Gluten-free crust</label>
+            <input
+              type="checkbox"
+              name="gluten-free-crust"
+              id="gluten-free-crust"
+            />
+          </p>
           <p>
             <label htmlFor="delivery-time">Preferred delivery time:</label>
             <input
