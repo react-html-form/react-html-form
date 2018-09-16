@@ -24,9 +24,6 @@ class Form extends React.Component {
       // Save the value
       if (element.name) {
         switch (element.type) {
-          case "fieldset":
-            // no-op
-            break;
           case "file":
             values[element.name] = {
               value: element.value,
