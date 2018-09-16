@@ -27,6 +27,12 @@ class Form extends React.Component {
           case "fieldset":
             // no-op
             break;
+          case "file":
+            values[element.name] = {
+              value: element.value,
+              files: element.files
+            };
+            break;
           case "radio":
             if (element.checked) {
               values[element.name] = element.value;

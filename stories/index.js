@@ -10,8 +10,9 @@ class ProofOfConcept extends React.Component {
     this.state = {};
   }
 
-  handleData({ values, errors }) {
-    this.setState({ values, errors });
+  handleData(data) {
+    this.setState(data);
+    console.log(data);
   }
 
   handleSubmit(event, { values, errors }, form) {
@@ -108,6 +109,15 @@ class ProofOfConcept extends React.Component {
             </label>
             <br />
             <textarea name="delivery-instructions" id="delivery-instructions" />
+          </p>
+          <p>
+            <label htmlFor="coupon">Coupon(s)</label>
+            <br />
+            <input multiple type="file" name="coupon(s)" id="coupon" />
+            <br />
+            <small>
+              (See console for the <code>FileList</code> object)
+            </small>
           </p>
           <p>
             <button type="submit" name="submit" value="Order my pizza!">
