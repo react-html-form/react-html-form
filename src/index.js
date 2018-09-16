@@ -24,19 +24,16 @@ class Form extends React.Component {
 
       // Save the value
       if (element.name) {
+        // Placeholders for select-multiple
+        const elementOptions = element.options;
+        const elementValues = [];
+
         switch (element.type) {
           case "file":
             values[element.name] = {
               value: element.value,
               files: element.files
             };
-            break;
-          case "radio":
-            if (element.checked) {
-              values[element.name] = element.value;
-            } else if (element.indeterminate) {
-              values[element.name] = undefined;
-            }
             break;
           case "checkbox":
             if (!values[element.name]) {
@@ -57,6 +54,24 @@ class Form extends React.Component {
               if (element.checked) {
                 values[element.name].push(element.value);
               }
+            }
+            break;
+          case "radio":
+            if (element.checked) {
+              values[element.name] = element.value;
+            } else if (element.indeterminate) {
+              values[element.name] = undefined;
+            }
+            break;
+          case "select-multiple":
+            for (let j = 0; j < elementOptions.length; j += 1) {
+              if (elementOptions[j].selected) {
+                elementValues.push(elementOptions[j].value);
+              }
+            }
+            values[element.name] = elementValues;
+            if (element.validationMessage.length > 0) {
+              errors[element.name] = element.validationMessage;
             }
             break;
           default:

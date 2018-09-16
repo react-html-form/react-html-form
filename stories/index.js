@@ -119,6 +119,25 @@ class ProofOfConcept extends React.Component {
             />
           </p>
           <p>
+            <label htmlFor="drinks">
+              Drinks (cmd+click to select multiple)
+            </label>
+            <br />
+            <select multiple id="drinks" name="drinks" size={9}>
+              <optgroup label="alcoholic">
+                <option>Beer</option>
+                <option>Wine</option>
+                <option>Liquor</option>
+              </optgroup>
+              <optgroup label="non-alcoholic">
+                <option>Water</option>
+                <option>Soda</option>
+                <option>Tea</option>
+                <option>Coffee</option>
+              </optgroup>
+            </select>
+          </p>
+          <p>
             <label htmlFor="delivery-time">Preferred delivery time:</label>
             <input
               // uncomment the following lines - they work as expected
