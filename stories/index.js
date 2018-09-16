@@ -10,9 +10,9 @@ class ProofOfConcept extends React.Component {
     this.state = {};
   }
 
-  handleData({ values, errors }) {
-    this.setState({ values, errors });
-    console.log({ values, errors });
+  handleData(data) {
+    this.setState(data);
+    console.log(data);
   }
 
   handleSubmit(event, { values, errors }, form) {

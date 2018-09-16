@@ -92,7 +92,8 @@ class Form extends React.Component {
 
     return {
       values,
-      errors
+      errors,
+      isValid: this.form.checkValidity()
     };
   }
 
