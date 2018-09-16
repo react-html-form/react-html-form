@@ -15,24 +15,42 @@ class Form extends React.Component {
     for (let i = 0; i < this.form.elements.length; i += 1) {
       const element = this.form.elements[i];
 
-      // Check for the name since not all form.elements have name's (like <fieldset />)
-      // Otherwise, this would result in empty string keys: `{ name: "example", "": ""}`
-      if (this.form.elements[i].name) {
-        switch (element.type) {
-          case "radio":
-            if (element.checked) {
-              values[element.name] = element.value;
-            }
-            if (element.validationMessage.length > 0) {
-              errors[element.name] = element.validationMessage;
-            }
-            break;
-          default:
+      // Save the error message
+      if (element.validationMessage.length > 0) {
+        errors[element.name] = element.validationMessage;
+      }
+
+      // Save the value
+      switch (element.type) {
+        case "fieldset":
+          // no-op
+          break;
+        case "radio":
+          if (element.checked) {
             values[element.name] = element.value;
-            if (element.validationMessage.length > 0) {
-              errors[element.name] = this.form.elements[i].validationMessage;
+          }
+          break;
+        case "checkbox":
+          if (!values[element.name]) {
+            if (element.checked) {
+              values[element.name] =
+                element.value === "on" ? true : element.value;
+            } else {
+              values[element.name] = false;
             }
-        }
+          } else {
+            // Convert to an array of values since we're probably in a fieldset
+            // (Or at least, the user has declared multiple checkboxes with the same name)
+            if (!Array.isArray(values[element.name])) {
+              values[element.name] = new Array(values[element.name]);
+            }
+            if (element.checked) {
+              values[element.name].push(element.value);
+            }
+          }
+          break;
+        default:
+          values[element.name] = element.value;
       }
     }
 
