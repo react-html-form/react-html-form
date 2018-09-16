@@ -4,6 +4,7 @@ import React from "react";
 class Form extends React.Component {
   constructor(props) {
     super(props);
+    this.touched = {};
     this.getFormState = this.getFormState.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleReset = this.handleReset.bind(this);
@@ -93,28 +94,30 @@ class Form extends React.Component {
     return {
       values,
       errors,
-      isValid: this.form.checkValidity()
+      isValid: this.form.checkValidity(),
+      touched: this.touched
     };
   }
 
   handleChange(event) {
+    const formState = this.getFormState();
+    this.touched[event.target.name] = true;
+
     this.props.onChange(event);
-    this.props.onData(this.getFormState(), this.form);
-    this.props.onChangeWithData(
-      event,
-      { values: undefined, errors: undefined },
-      this.form
-    );
+    this.props.onData(formState, this.form);
+    this.props.onChangeWithData(event, formState, this.form);
   }
 
   handleReset(event) {
+    const resetObject = {
+      values: {},
+      errors: {},
+      touched: {}
+    };
+
     this.props.onReset(event);
-    this.props.onData({ values: undefined, errors: undefined }, this.form);
-    this.props.onResetWithData(
-      event,
-      { values: undefined, errors: undefined },
-      this.form
-    );
+    this.props.onData(resetObject, this.form);
+    this.props.onResetWithData(event, resetObject, this.form);
   }
 
   handleSubmit(event) {
