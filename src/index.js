@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 
 class Form extends React.Component {
@@ -7,28 +8,33 @@ class Form extends React.Component {
   }
 
   handleChange(event) {
+    this.props.onChange(event);
     const values = {};
     const errors = {};
 
     for (let i = 0; i < this.form.elements.length; i += 1) {
-      values[this.form.elements[i].name] = this.form.elements[i].value;
-      if (this.form.elements[i].validationMessage.length > 0) {
-        errors[this.form.elements[i].name] = this.form.elements[
-          i
-        ].validationMessage;
+      // Check for the name since not all elements have values (like <fieldset />)
+      if (this.form.elements[i].name) {
+        values[this.form.elements[i].name] = this.form.elements[i].value;
+        if (this.form.elements[i].validationMessage.length > 0) {
+          errors[this.form.elements[i].name] = this.form.elements[
+            i
+          ].validationMessage;
+        }
       }
     }
 
     const hasErrors =
       Object.keys(errors).length !== 0 && errors.constructor === Object;
 
-    this.props.onChange(event, { values, errors, hasErrors });
+    this.props.onData({ values, errors, hasErrors });
   }
 
   render() {
+    const { onData, ...rest } = this.props;
     return (
       <form
-        {...this.props}
+        {...rest}
         onChange={this.handleChange}
         ref={c => {
           this.form = c;
@@ -39,5 +45,13 @@ class Form extends React.Component {
     );
   }
 }
+
+Form.defaultProps = {
+  onChange: () => {}
+};
+
+Form.propTypes = {
+  onChange: PropTypes.func
+};
 
 export default Form;
