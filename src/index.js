@@ -6,6 +6,7 @@ class Form extends React.Component {
     super(props);
     this.getFormState = this.getFormState.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handleReset = this.handleReset.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -85,6 +86,11 @@ class Form extends React.Component {
     this.props.onData(this.getFormState(), this.form);
   }
 
+  handleReset(event) {
+    this.props.onReset(event);
+    this.props.onData({ values: undefined, errors: undefined }, this.form);
+  }
+
   handleSubmit(event) {
     if (typeof this.props.onSubmit === "function") {
       event.preventDefault();
@@ -99,6 +105,7 @@ class Form extends React.Component {
         {...rest}
         noValidate={!this.props.domValidation}
         onChange={this.handleChange}
+        onReset={this.handleReset}
         onSubmit={this.handleSubmit}
         ref={c => {
           this.form = c;
@@ -111,11 +118,13 @@ class Form extends React.Component {
 }
 
 Form.defaultProps = {
-  onChange: () => {}
+  onChange: () => {},
+  onReset: () => {}
 };
 
 Form.propTypes = {
-  onChange: PropTypes.func
+  onChange: PropTypes.func,
+  onReset: PropTypes.func
 };
 
 export default Form;

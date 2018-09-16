@@ -93,6 +93,15 @@ class ProofOfConcept extends React.Component {
             />
           </p>
           <p>
+            <label htmlFor="breadsticks">Number of breadsticks</label>
+            <input
+              data-valueasnumber
+              type="number"
+              name="breadsticks"
+              id="breadsticks"
+            />
+          </p>
+          <p>
             <label htmlFor="delivery-time">Preferred delivery time:</label>
             <input
               // uncomment the following lines - they work as expected
@@ -123,16 +132,10 @@ class ProofOfConcept extends React.Component {
             </small>
           </p>
           <p>
-            <label htmlFor="breadsticks">Number of breadsticks</label>
-            <input
-              data-valueasnumber
-              type="number"
-              name="breadsticks"
-              id="breadsticks"
-            />
+            <input type="reset" value="Reset order" />
           </p>
           <p>
-            <button type="submit" name="submit" value="Order my pizza!">
+            <button type="submit" value="Order my pizza!">
               Submit order
             </button>
           </p>
