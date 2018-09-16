@@ -30,7 +30,7 @@ class ProofOfConcept extends React.Component {
             <input required name="email" id="email" type="email" />
           </p>
           <fieldset>
-            <legend>Pizza Size </legend>
+            <legend>Pizza Size</legend>
             <p>
               <label htmlFor="small">Small</label>
               <input id="small" type="radio" name="size" value="small" />
@@ -45,7 +45,7 @@ class ProofOfConcept extends React.Component {
             </p>
           </fieldset>
           <fieldset>
-            <legend> Pizza Toppings </legend>
+            <legend>Pizza Toppings</legend>
             <p>
               <label htmlFor="bacon">Bacon</label>
               <input type="checkbox" name="topping" id="bacon" value="bacon" />
