@@ -1,6 +1,6 @@
 import React from "react";
 import { storiesOf } from "@storybook/react";
-import Form from "../src";
+import Form, { defaultFormState } from "../src";
 
 class ProofOfConcept extends React.Component {
   constructor(props) {
@@ -8,6 +8,7 @@ class ProofOfConcept extends React.Component {
     this.handleData = this.handleData.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.state = {
+      ...defaultFormState,
       values: {
         email: "default@example.com"
       }
@@ -36,10 +37,12 @@ class ProofOfConcept extends React.Component {
             <label htmlFor="name">Customer name:</label>
             <input name="name" id="name" type="text" />
           </p>
-          <p>
-            <label htmlFor="telephone">Telephone:</label>
-            <input name="telephone" id="telephone" type="tel" />
-          </p>
+          {this.state.touched.name && (
+            <p>
+              <label htmlFor="telephone">Telephone:</label>
+              <input name="telephone" id="telephone" type="tel" />
+            </p>
+          )}
           <p>
             <label htmlFor="email">E-mail address:</label>
             <input
@@ -52,9 +55,9 @@ class ProofOfConcept extends React.Component {
           </p>
           <p>
             {" "}
-            <label htmlFor="style">Variety:</label>
-            <input list="styles" name="style" />
-            <datalist id="styles">
+            <label htmlFor="variety">Variety:</label>
+            <input list="variety" name="variety" />
+            <datalist id="variety">
               <option value="Neapolitan" />
               <option value="Sicilian" />
               <option value="Argentine" />
