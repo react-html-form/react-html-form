@@ -151,7 +151,7 @@ class Form extends React.PureComponent {
       errors,
       dirty: this.dirty,
       touched: this.touched,
-      isDirty: !isEqual(values, this.values),
+      isDirty: resetting ? false : !isEqual(values, this.values),
       isValid:
         Object.keys(errors).length === 0 && errors.constructor === Object,
       submitCount: this.submitCount
