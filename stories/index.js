@@ -38,7 +38,13 @@ class ProofOfConcept extends React.Component {
           </p>
           <p>
             <label htmlFor="email">E-mail address:</label>
-            <input required name="email" id="email" type="email" />
+            <input
+              required
+              name="email"
+              id="email"
+              type="email"
+              defaultValue="e@example.com"
+            />
           </p>
           <p>
             {" "}

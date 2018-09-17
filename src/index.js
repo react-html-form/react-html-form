@@ -4,7 +4,10 @@ import React from "react";
 class Form extends React.Component {
   constructor(props) {
     super(props);
+
+    this.submitCount = 0;
     this.touched = {};
+
     this.getFormState = this.getFormState.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleReset = this.handleReset.bind(this);
@@ -94,8 +97,9 @@ class Form extends React.Component {
     return {
       values,
       errors,
+      touched: this.touched,
       isValid: this.form.checkValidity(),
-      touched: this.touched
+      submitCount: this.submitCount
     };
   }
 
@@ -109,22 +113,33 @@ class Form extends React.Component {
   }
 
   handleReset(event) {
-    const resetObject = {
-      values: {},
-      errors: {},
-      touched: {}
-    };
+    // Wrap in setTimeout(0) to wait for internal .reset to finish
+    setTimeout(() => {
+      this.submitCount = 0;
+      this.touched = {};
+      const resetObject = {
+        values: {},
+        errors: {},
+        isValid: this.form.checkValidity(),
+        touched: this.touched,
+        submitCount: this.submitCount
+      };
 
-    this.props.onReset(event);
-    this.props.onData(resetObject, this.form);
-    this.props.onResetWithData(event, resetObject, this.form);
+      this.props.onReset(event);
+      this.props.onData(resetObject, this.form);
+      this.props.onResetWithData(event, resetObject, this.form);
+    }, 0);
   }
 
   handleSubmit(event) {
+    this.submitCount += 1;
+    const formState = this.getFormState();
+
     this.props.onSubmit(event);
+    this.props.onData(formState, this.form);
     if (typeof this.props.onSubmitWithData === "function") {
       event.preventDefault();
-      this.props.onSubmitWithData(event, this.getFormState(), this.form);
+      this.props.onSubmitWithData(event, formState, this.form);
     }
   }
 
