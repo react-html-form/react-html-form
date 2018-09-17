@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import isEqual from "react-fast-compare";
 
-class Form extends React.Component {
+class Form extends React.PureComponent {
   constructor(props) {
     super(props);
 
@@ -16,7 +16,9 @@ class Form extends React.Component {
   }
 
   componentDidMount() {
-    this.values = this.getFormState().values;
+    const formState = this.getFormState();
+    this.values = formState.values;
+    this.props.onData(formState, this.form);
   }
 
   getFormState() {
@@ -123,17 +125,11 @@ class Form extends React.Component {
     setTimeout(() => {
       this.submitCount = 0;
       this.touched = {};
-      const resetObject = {
-        values: {},
-        errors: {},
-        isValid: this.form.checkValidity(),
-        touched: this.touched,
-        submitCount: this.submitCount
-      };
+      const formState = this.getFormState();
 
       this.props.onReset(event);
-      this.props.onData(resetObject, this.form);
-      this.props.onResetWithData(event, resetObject, this.form);
+      this.props.onData(formState, this.form);
+      this.props.onResetWithData(event, formState, this.form);
     }, 0);
   }
 
