@@ -7,7 +7,22 @@ class ProofOfConcept extends React.Component {
     super(props);
     this.handleData = this.handleData.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.state = {};
+    this.state = {
+      values: {
+        email: "default@example.com"
+      }
+    };
+  }
+
+  componentDidMount() {
+    setTimeout(() => {
+      this.setState({
+        values: {
+          ...this.state.values,
+          email: "somethingdifferent@example.com"
+        }
+      });
+    }, 5000);
   }
 
   handleData(data) {
@@ -43,7 +58,7 @@ class ProofOfConcept extends React.Component {
               name="email"
               id="email"
               type="email"
-              defaultValue="e@example.com"
+              value={this.state.values.email}
             />
           </p>
           <p>

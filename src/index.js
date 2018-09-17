@@ -21,7 +21,7 @@ class Form extends React.PureComponent {
     this.props.onData(formState, this.form);
   }
 
-  getFormState() {
+  getFormState({ reset } = {}) {
     const values = {};
     const errors = {};
 
@@ -38,6 +38,11 @@ class Form extends React.PureComponent {
         // Placeholders for select-multiple
         const elementOptions = element.options;
         const elementValues = [];
+
+        // Piggy back off this for-loop when calling onReset
+        if (reset) {
+          element.defaultValue = this.values[element.name];
+        }
 
         switch (element.type) {
           case "file":
@@ -125,7 +130,7 @@ class Form extends React.PureComponent {
     setTimeout(() => {
       this.submitCount = 0;
       this.touched = {};
-      const formState = this.getFormState();
+      const formState = this.getFormState({ reset: true });
 
       this.props.onReset(event);
       this.props.onData(formState, this.form);
