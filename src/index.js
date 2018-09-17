@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
+import isEqual from "react-fast-compare";
 
 class Form extends React.Component {
   constructor(props) {
@@ -12,6 +13,10 @@ class Form extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleReset = this.handleReset.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  componentDidMount() {
+    this.values = this.getFormState().values;
   }
 
   getFormState() {
@@ -98,6 +103,7 @@ class Form extends React.Component {
       values,
       errors,
       touched: this.touched,
+      isDirty: !isEqual(values, this.values),
       isValid: this.form.checkValidity(),
       submitCount: this.submitCount
     };
