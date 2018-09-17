@@ -50,6 +50,7 @@ class ProofOfConcept extends React.Component {
               name="email"
               id="email"
               type="email"
+              onChange={() => {}}
               value={this.state.values.email}
             />
           </p>

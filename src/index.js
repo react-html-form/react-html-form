@@ -43,7 +43,18 @@ class Form extends React.PureComponent {
 
         // Piggy back off this for-loop when calling onReset
         if (reset) {
-          element.defaultValue = this.values[element.name];
+          // Set the value to the original value when the component was mounted
+          if (this.values[element.name]) {
+            element.defaultValue = this.values[element.name];
+          }
+
+          // If the input wasn't there when we rendered the component
+          // we remove it from the values object
+          if (
+            !Object.prototype.hasOwnProperty.call(this.values, element.name)
+          ) {
+            delete values[element.name];
+          }
         }
 
         switch (element.type) {
