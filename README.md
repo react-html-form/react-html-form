@@ -6,7 +6,7 @@
 
 "HTML form elements work a little bit differently from other DOM elements in React, because form elements naturally keep some internal state."[1] What this means, unfortunately, is that managing form state in React is not an easy feat.
 
-Our mission is to build a great developer experience around forms. We let you manage forms with a straightforward API by _embracing_ the fact that forms keep internal state, not fighting against it.
+Our mission is to build a great developer experience around forms. We let you manage forms with a straightforward API by **_embracing_ the fact that forms keep internal state, not fighting against it.**
 
 ## Problems with current form libraries
 
