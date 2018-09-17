@@ -7,10 +7,12 @@ class Form extends React.PureComponent {
     super(props);
 
     this.submitCount = 0;
+    this.dirty = {};
     this.touched = {};
 
     this.getFormState = this.getFormState.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handleFocus = this.handleFocus.bind(this);
     this.handleReset = this.handleReset.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -109,6 +111,7 @@ class Form extends React.PureComponent {
     return {
       values,
       errors,
+      dirty: this.dirty,
       touched: this.touched,
       isDirty: !isEqual(values, this.values),
       isValid: this.form.checkValidity(),
@@ -118,17 +121,25 @@ class Form extends React.PureComponent {
 
   handleChange(event) {
     const formState = this.getFormState();
-    this.touched[event.target.name] = true;
+    this.dirty[event.target.name] = true;
 
     this.props.onChange(event);
     this.props.onData(formState, this.form);
     this.props.onChangeWithData(event, formState, this.form);
   }
 
+  handleFocus(event) {
+    this.touched[event.target.name] = true;
+
+    this.props.onFocus(event);
+    this.props.onData({ touched: this.touched }, this.form);
+  }
+
   handleReset(event) {
     // Wrap in setTimeout(0) to wait for internal .reset to finish
     setTimeout(() => {
       this.submitCount = 0;
+      this.dirty = {};
       this.touched = {};
       const formState = this.getFormState({ reset: true });
 
@@ -163,6 +174,7 @@ class Form extends React.PureComponent {
         {...rest}
         noValidate={!this.props.domValidation}
         onChange={this.handleChange}
+        onFocus={this.handleFocus}
         onReset={this.handleReset}
         onSubmit={this.handleSubmit}
         ref={c => {
@@ -178,6 +190,7 @@ class Form extends React.PureComponent {
 Form.defaultProps = {
   onChange: () => {},
   onChangeWithData: () => {},
+  onFocus: () => {},
   onReset: () => {},
   onResetWithData: () => {},
   onSubmit: () => {},
@@ -187,6 +200,7 @@ Form.defaultProps = {
 Form.propTypes = {
   onChange: PropTypes.func,
   onChangeWithData: PropTypes.func,
+  onFocus: PropTypes.func,
   onReset: PropTypes.func,
   onResetWithData: PropTypes.func,
   onSubmit: PropTypes.func,
@@ -194,3 +208,13 @@ Form.propTypes = {
 };
 
 export default Form;
+
+export const defaultFormState = {
+  values: {},
+  errors: {},
+  dirty: {},
+  touched: {},
+  isDirty: false,
+  isValid: undefined,
+  submitCount: 0
+};
