@@ -10,19 +10,19 @@ class ProofOfConcept extends React.Component {
     this.state = {
       ...defaultFormState,
       values: {
-        email: "default@example.com"
+        email: "pizza@example.com"
       }
     };
   }
 
   handleData(data) {
     this.setState(data);
-    console.log(data);
+    // console.log(data);
   }
 
-  handleSubmit(event, { values, errors }, form) {
+  handleSubmit(event, { values, errors, isValid }) {
     this.setState({ values, errors });
-    if (!form.reportValidity()) {
+    if (!isValid) {
       window.alert("form is invalid");
     } else {
       window.alert("form is valid");
@@ -32,15 +32,34 @@ class ProofOfConcept extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <Form onData={this.handleData} onSubmitWithData={this.handleSubmit}>
+        <Form
+          onData={this.handleData}
+          onSubmitWithData={this.handleSubmit}
+          validateOnBlur={{
+            email: input => {
+              if (input === "pizza@example.com") {
+                return `Seriously, ${input} is taken`;
+              }
+              return undefined;
+            }
+          }}
+          validateOnChange={{
+            email: input => {
+              if (input === "pizza@example.com") {
+                return `${input} is taken`;
+              }
+              return undefined;
+            }
+          }}
+        >
           <p>
             <label htmlFor="name">Customer name:</label>
-            <input name="name" id="name" type="text" />
+            <input required name="name" id="name" type="text" />
           </p>
           {this.state.touched.name && (
             <p>
               <label htmlFor="telephone">Telephone:</label>
-              <input name="telephone" id="telephone" type="tel" />
+              <input required name="telephone" id="telephone" type="tel" />
             </p>
           )}
           <p>
@@ -53,7 +72,10 @@ class ProofOfConcept extends React.Component {
               onChange={() => {}}
               value={this.state.values.email}
             />
+            <small> (pizza@example.com is not allowed)</small>
           </p>
+          {!!this.state.submitCount &&
+            this.state.errors.email && <p>{this.state.errors.email}</p>}
           <p>
             {" "}
             <label htmlFor="variety">Variety:</label>

@@ -11,6 +11,7 @@ class Form extends React.PureComponent {
     this.touched = {};
 
     this.getFormState = this.getFormState.bind(this);
+    this.handleBlur = this.handleBlur.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleFocus = this.handleFocus.bind(this);
     this.handleReset = this.handleReset.bind(this);
@@ -23,17 +24,13 @@ class Form extends React.PureComponent {
     this.props.onData(formState, this.form);
   }
 
-  getFormState({ reset } = {}) {
+  getFormState({ resetting, submitting } = {}) {
     const values = {};
     const errors = {};
 
-    for (let i = 0; i < this.form.elements.length; i += 1) {
+    // Iterate in reverse order so we can focus the first element with an error
+    for (let i = this.form.elements.length - 1; i >= 0; i -= 1) {
       const element = this.form.elements[i];
-
-      // Save the error message
-      if (element.validationMessage.length > 0) {
-        errors[element.name] = element.validationMessage;
-      }
 
       // Save the value
       if (element.name) {
@@ -42,10 +39,14 @@ class Form extends React.PureComponent {
         const elementValues = [];
 
         // Piggy back off this for-loop when calling onReset
-        if (reset) {
+        if (resetting) {
+          // Clear any custom validation errors
+          element.setCustomValidity("");
+
           // Set the value to the original value when the component was mounted
           if (this.values[element.name]) {
             element.defaultValue = this.values[element.name];
+            element.checkValidity(); // recheck the validity, order here is important
           }
 
           // If the input wasn't there when we rendered the component
@@ -117,6 +118,32 @@ class Form extends React.PureComponent {
           values[element.name] = element.valueAsNumber;
         }
       }
+
+      // Save the error message
+      // Important error checking comes after setting the defaultValue above when resetting
+      if (element.validationMessage.length > 0) {
+        if (!this.props.domValidation && submitting) {
+          element.focus();
+        }
+        errors[element.name] = element.validationMessage;
+      }
+
+      // Perform any custom validation
+      if (this.props.validateOnChange[element.name]) {
+        const errorMessage = this.props.validateOnChange[element.name](
+          values[element.name]
+        );
+        if (errorMessage) {
+          if (this.props.domValidation) {
+            element.setCustomValidity(errorMessage);
+          } else if (submitting) {
+            element.focus();
+          }
+          errors[element.name] = errorMessage;
+        } else {
+          element.setCustomValidity("");
+        }
+      }
     }
 
     return {
@@ -125,9 +152,31 @@ class Form extends React.PureComponent {
       dirty: this.dirty,
       touched: this.touched,
       isDirty: !isEqual(values, this.values),
-      isValid: this.form.checkValidity(),
+      isValid:
+        Object.keys(errors).length === 0 && errors.constructor === Object,
       submitCount: this.submitCount
     };
+  }
+
+  handleBlur(event) {
+    this.props.onBlur(event);
+
+    // Perfom custom validation
+    const errors = {};
+    if (this.props.validateOnBlur[event.target.name]) {
+      const errorMessage = this.props.validateOnBlur[event.target.name](
+        event.target.value
+      );
+      if (errorMessage) {
+        event.target.setCustomValidity(errorMessage);
+        errors[event.target.name] = errorMessage;
+        this.props.onData({ errors });
+      } else {
+        event.target.setCustomValidity("");
+        errors[event.target.name] = undefined;
+        this.props.onData({ errors });
+      }
+    }
   }
 
   handleChange(event) {
@@ -152,7 +201,7 @@ class Form extends React.PureComponent {
       this.submitCount = 0;
       this.dirty = {};
       this.touched = {};
-      const formState = this.getFormState({ reset: true });
+      const formState = this.getFormState({ resetting: true });
 
       this.props.onReset(event);
       this.props.onData(formState, this.form);
@@ -162,7 +211,7 @@ class Form extends React.PureComponent {
 
   handleSubmit(event) {
     this.submitCount += 1;
-    const formState = this.getFormState();
+    const formState = this.getFormState({ submitting: true });
 
     this.props.onSubmit(event);
     this.props.onData(formState, this.form);
@@ -174,16 +223,20 @@ class Form extends React.PureComponent {
 
   render() {
     const {
+      domValidation,
       onData,
       onChangeWithData,
       onResetWithData,
       onSubmitWithData,
+      validateOnBlur,
+      validateOnChange,
       ...rest
     } = this.props;
     return (
       <form
         {...rest}
         noValidate={!this.props.domValidation}
+        onBlur={this.handleBlur}
         onChange={this.handleChange}
         onFocus={this.handleFocus}
         onReset={this.handleReset}
@@ -199,23 +252,31 @@ class Form extends React.PureComponent {
 }
 
 Form.defaultProps = {
+  domValidation: false,
+  onBlur: () => {},
   onChange: () => {},
   onChangeWithData: () => {},
   onFocus: () => {},
   onReset: () => {},
   onResetWithData: () => {},
   onSubmit: () => {},
-  onSubmitWithData: () => {}
+  onSubmitWithData: () => {},
+  validateOnBlur: {},
+  validateOnChange: {}
 };
 
 Form.propTypes = {
+  domValidation: PropTypes.bool,
+  onBlur: PropTypes.func,
   onChange: PropTypes.func,
   onChangeWithData: PropTypes.func,
   onFocus: PropTypes.func,
   onReset: PropTypes.func,
   onResetWithData: PropTypes.func,
   onSubmit: PropTypes.func,
-  onSubmitWithData: PropTypes.func
+  onSubmitWithData: PropTypes.func,
+  validateOnBlur: PropTypes.object, // eslint-disable-line
+  validateOnChange: PropTypes.object // eslint-disable-line
 };
 
 export default Form;
