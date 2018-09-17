@@ -14,17 +14,6 @@ class ProofOfConcept extends React.Component {
     };
   }
 
-  componentDidMount() {
-    setTimeout(() => {
-      this.setState({
-        values: {
-          ...this.state.values,
-          email: "somethingdifferent@example.com"
-        }
-      });
-    }, 5000);
-  }
-
   handleData(data) {
     this.setState(data);
     console.log(data);
