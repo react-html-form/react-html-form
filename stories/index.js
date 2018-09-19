@@ -245,4 +245,4 @@ class KitchenSink extends React.Component {
   }
 }
 
-storiesOf("Form", module).add("proof of concept", () => <KitchenSink />);
+storiesOf("Form", module).add("KitchenSink", () => <KitchenSink />);
