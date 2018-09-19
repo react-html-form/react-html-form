@@ -17,7 +17,7 @@ class ProofOfConcept extends React.Component {
 
   handleData(data) {
     this.setState(data);
-    // console.log(data);
+    console.log(data);
   }
 
   handleSubmit(event, { values, errors, isValid }) {
@@ -36,11 +36,21 @@ class ProofOfConcept extends React.Component {
           onData={this.handleData}
           onSubmitWithData={this.handleSubmit}
           validateOnBlur={{
-            email: input => {
+            email: async input => {
               if (input === "pizza@example.com") {
                 return `Seriously, ${input} is taken`;
               }
-              return undefined;
+              if (input === "good@example.com") {
+                return undefined;
+              }
+              const error = await new Promise(resolve => {
+                setTimeout(() => {
+                  resolve(
+                    `got an async error for ${input}, try 'good@example.com'`
+                  );
+                }, 5000);
+              });
+              return error;
             }
           }}
           validateOnChange={{
@@ -72,10 +82,12 @@ class ProofOfConcept extends React.Component {
               onChange={() => {}}
               value={this.state.values.email}
             />
-            <small> (pizza@example.com is not allowed)</small>
+            <small>
+              {this.state.isValidating && "(validating)"} (pizza@example.com is
+              not allowed)
+            </small>
           </p>
-          {!!this.state.submitCount &&
-            this.state.errors.email && <p>{this.state.errors.email}</p>}
+          {this.state.errors.email && <p>{this.state.errors.email}</p>}
           <p>
             {" "}
             <label htmlFor="variety">Variety:</label>
@@ -207,7 +219,11 @@ class ProofOfConcept extends React.Component {
             <input type="reset" value="Reset order" />
           </p>
           <p>
-            <button type="submit" value="Order my pizza!">
+            <button
+              type="submit"
+              value="Order my pizza!"
+              disabled={this.state.isValidating}
+            >
               Submit order
             </button>
           </p>

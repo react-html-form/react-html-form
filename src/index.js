@@ -151,6 +151,7 @@ class Form extends React.PureComponent {
       errors,
       dirty: this.dirty,
       touched: this.touched,
+      isValidating: this.isValidating,
       isDirty: resetting ? false : !isEqual(values, this.values),
       isValid:
         Object.keys(errors).length === 0 && errors.constructor === Object,
@@ -158,13 +159,18 @@ class Form extends React.PureComponent {
     };
   }
 
-  handleBlur(event) {
+  async handleBlur(event) {
+    event.persist();
     this.props.onBlur(event);
 
     // Perfom custom validation
     const errors = {};
+    this.isValidating = true;
+    this.props.onData({
+      isValidating: this.isValidating
+    });
     if (this.props.validateOnBlur[event.target.name]) {
-      const errorMessage = this.props.validateOnBlur[event.target.name](
+      const errorMessage = await this.props.validateOnBlur[event.target.name](
         event.target.value
       );
       if (errorMessage) {
@@ -177,6 +183,10 @@ class Form extends React.PureComponent {
         this.props.onData({ errors });
       }
     }
+    this.isValidating = false;
+    this.props.onData({
+      isValidating: this.isValidating
+    });
   }
 
   handleChange(event) {
@@ -288,5 +298,6 @@ export const defaultFormState = {
   touched: {},
   isDirty: false,
   isValid: undefined,
+  isValidating: false,
   submitCount: 0
 };
