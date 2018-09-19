@@ -33,6 +33,9 @@ class Form extends React.PureComponent {
     for (let i = this.form.elements.length - 1; i >= 0; i -= 1) {
       const element = this.form.elements[i];
 
+      // Reset to a blank state
+      element.setCustomValidity("");
+
       // Save the value
       if (element.name) {
         // Placeholders for select-multiple
@@ -41,9 +44,6 @@ class Form extends React.PureComponent {
 
         // Piggy back off this for-loop when calling onReset
         if (resetting) {
-          // Clear any custom validation errors
-          element.setCustomValidity("");
-
           // Set the value to the original value when the component was mounted
           if (this.values[element.name]) {
             element.defaultValue = this.values[element.name];
@@ -129,6 +129,9 @@ class Form extends React.PureComponent {
         errors[element.name] = element.validationMessage;
         if (element.hasAttribute("data-errormessage")) {
           errors[element.name] = element.getAttribute("data-errormessage");
+          if (this.props.domValidation) {
+            element.setCustomValidity(errors[element.name]);
+          }
         }
       }
 

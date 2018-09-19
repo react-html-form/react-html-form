@@ -33,6 +33,7 @@ class KitchenSink extends React.Component {
     return (
       <React.Fragment>
         <Form
+          domValidation={false}
           onData={this.handleData}
           onSubmitWithData={this.handleSubmit}
           validateOnBlur={{
@@ -66,14 +67,14 @@ class KitchenSink extends React.Component {
             <label htmlFor="name">Customer name:</label>
             <input
               required
-              data-errormessage="Name can only include letters"
-              pattern="A-Za-z+"
+              data-errormessage="Name is required and can only include letters"
+              pattern="[A-Za-z]+"
               name="name"
               id="name"
               type="text"
             />
             {this.state.blurred.name &&
-              this.state.errors.name && <p>{this.state.errors.name}</p>}
+              this.state.errors.name && <span>{this.state.errors.name}</span>}
           </p>
           {this.state.touched.name && (
             <p>
