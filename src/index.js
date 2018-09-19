@@ -201,7 +201,9 @@ class Form extends React.PureComponent {
 
   handleChange(event) {
     const formState = this.getFormState();
-    this.dirty[event.target.name] = true;
+    if (event.target.name) {
+      this.dirty[event.target.name] = true;
+    }
 
     this.props.onChange(event);
     this.props.onData(formState, this.form);
@@ -209,7 +211,9 @@ class Form extends React.PureComponent {
   }
 
   handleFocus(event) {
-    this.touched[event.target.name] = true;
+    if (event.target.name) {
+      this.touched[event.target.name] = true;
+    }
 
     this.props.onFocus(event);
     this.props.onData({ touched: this.touched }, this.form);
