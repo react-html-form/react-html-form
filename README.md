@@ -23,9 +23,9 @@ We keep our API surface small by pulling form state (values and errors) directly
 ## Install
 
 ```sh
-$ npm install react-html-form --save
+$ npm install react-html-form@beta --save
 $ # or
-$ yarn add react-html-form
+$ yarn add react-html-form@beta
 ```
 
 ## Usage
