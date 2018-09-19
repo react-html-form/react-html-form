@@ -2,6 +2,10 @@
 
 > The simplest form component for React
 
+**Notice:** This project is in beta. I'm seeking beta testers and co-authors/maintainers.
+
+###### Immediate roadmap: feedback/bug reports from the community, documentation, unit tests.
+
 ## Overview
 
 "HTML form elements work a little bit differently from other DOM elements in React, because form elements naturally keep some internal state."[1] What this means, unfortunately, is that managing form state in React is not an easy feat.
@@ -26,12 +30,14 @@ $ yarn add react-html-form
 
 ## Usage
 
+See https://codesandbox.io/embed/x70lxkzkvo?hidenavigation=1&view=split for a full "KitchenSink" demo.
+
 ```jsx
 import Form from "react-html-form";
 import React from "react";
 
 class MyPage extends React.Component {
-  handleSubmit(event, formState) {
+  handleSubmit(event, formState, formReference) {
     // formState = {
     //   values: {
     //     usersName: 'demo',
@@ -61,7 +67,11 @@ class MyPage extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <Form onSubmitWithData={this.handleSubmit}>
+        <Form
+          // include `WithData` to any form event handler to get the form state included for free as the second argument. The third argument is a reference to the form itself
+          // You can still use the standard `onSubmit` if you please
+          onSubmitWithData={this.handleSubmit}
+        >
           <label>Name:</label>
           <input
             required
