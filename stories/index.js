@@ -2,7 +2,7 @@ import React from "react";
 import { storiesOf } from "@storybook/react";
 import Form, { defaultFormState } from "../src";
 
-class ProofOfConcept extends React.Component {
+class KitchenSink extends React.Component {
   constructor(props) {
     super(props);
     this.handleData = this.handleData.bind(this);
@@ -245,4 +245,4 @@ class ProofOfConcept extends React.Component {
   }
 }
 
-storiesOf("Form", module).add("proof of concept", () => <ProofOfConcept />);
+storiesOf("Form", module).add("proof of concept", () => <KitchenSink />);
