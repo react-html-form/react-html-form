@@ -16,6 +16,62 @@ Other React form libraries introduce patterns that aren’t very ergonomic or ha
 
 We keep our API surface small by pulling form state (values and errors) directly out of the DOM through the `HTMLFormElement` interface.
 
+## Install
+
+```sh
+$ npm install react-html-form --save
+$ # or
+$ yarn add react-html-form
+```
+
+## Usage
+
+```jsx
+import Form from "react-html-form";
+import React from "react";
+
+class MyPage extends React.Component {
+  handleSubmit(event, formState) {
+    // formState = {
+    //   values: {
+    //     usersName: 'demo',
+    //     usersEmail: 'demo@example.com',
+    //   },
+    //   errors: {},
+    //   dirty: {
+    //     usersName: true,
+    //     usersEmail: true,
+    //   },
+    //   touched: {
+    //     usersName: true,
+    //     usersEmail: true,
+    //   },
+    //   isDirty: true,
+    //   isValid: true,
+    //   isValidating: false,
+    //   submitCount: 1
+    // }
+    yourHttpClient.post("http://api.example.com/", formState.values);
+  }
+
+  render() {
+    return (
+      <React.Fragment>
+        <Form onSubmitWithData={this.handleSubmit}>
+          <label>Name:</label>
+          <input required name="usersName" type="text" />
+          <br />
+          <label>Email</label>
+          <input required name="email" type="email" />
+          <br />
+          <button type="submit">Submit</button>
+        </Form>
+      </React.Fragment>
+    );
+  }
+}
+```
+
 ---
 
 ## Credits
