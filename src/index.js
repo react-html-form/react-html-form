@@ -126,6 +126,9 @@ class Form extends React.PureComponent {
           element.focus();
         }
         errors[element.name] = element.validationMessage;
+        if (element.hasAttribute("data-errormessage")) {
+          errors[element.name] = element.getAttribute("data-errormessage");
+        }
       }
 
       // Perform any custom validation

@@ -59,7 +59,13 @@ class MyPage extends React.Component {
       <React.Fragment>
         <Form onSubmitWithData={this.handleSubmit}>
           <label>Name:</label>
-          <input required name="usersName" type="text" />
+          <input
+            required
+            data-errormessage="Name can only include letters"
+            pattern="A-Za-z+"
+            name="usersName"
+            type="text"
+          />
           <br />
           <label>Email</label>
           <input required name="email" type="email" />

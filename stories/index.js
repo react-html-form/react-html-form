@@ -64,7 +64,15 @@ class ProofOfConcept extends React.Component {
         >
           <p>
             <label htmlFor="name">Customer name:</label>
-            <input required name="name" id="name" type="text" />
+            <input
+              required
+              data-errormessage="Name can only include letters"
+              pattern="A-Za-z+"
+              name="name"
+              id="name"
+              type="text"
+            />
+            {this.state.errors.name && <p>{this.state.errors.name}</p>}
           </p>
           {this.state.touched.name && (
             <p>
