@@ -150,13 +150,20 @@ class Form extends React.PureComponent {
       }
     }
 
+    let isDirty;
+    if (!this.values) {
+      isDirty = false; // not dirty on first load
+    } else {
+      isDirty = resetting ? false : !isEqual(values, this.values);
+    }
+
     return {
       values,
       errors,
       dirty: this.dirty,
       touched: this.touched,
       isValidating: this.isValidating,
-      isDirty: resetting ? false : !isEqual(values, this.values),
+      isDirty,
       isValid:
         Object.keys(errors).length === 0 && errors.constructor === Object,
       submitCount: this.submitCount
