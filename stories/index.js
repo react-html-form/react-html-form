@@ -72,7 +72,8 @@ class ProofOfConcept extends React.Component {
               id="name"
               type="text"
             />
-            {this.state.errors.name && <p>{this.state.errors.name}</p>}
+            {this.state.blurred.name &&
+              this.state.errors.name && <p>{this.state.errors.name}</p>}
           </p>
           {this.state.touched.name && (
             <p>

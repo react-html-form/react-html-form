@@ -46,6 +46,10 @@ class MyPage extends React.Component {
     //     usersName: true,
     //     usersEmail: true,
     //   },
+    //   blurred: {
+    //     usersName: true,
+    //     usersEmail: true,
+    //   },
     //   isDirty: true,
     //   isValid: true,
     //   isValidating: false,

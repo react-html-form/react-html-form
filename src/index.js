@@ -7,6 +7,7 @@ class Form extends React.PureComponent {
     super(props);
 
     this.submitCount = 0;
+    this.blurred = {};
     this.dirty = {};
     this.touched = {};
 
@@ -166,6 +167,12 @@ class Form extends React.PureComponent {
     event.persist();
     this.props.onBlur(event);
 
+    // Let the user know what’s been blurred
+    if (event.target.name) {
+      this.blurred[event.target.name] = true;
+      this.props.onData({ blurred: this.blurred });
+    }
+
     // Perfom custom validation
     const errors = {};
     this.isValidating = true;
@@ -212,6 +219,7 @@ class Form extends React.PureComponent {
     // Wrap in setTimeout(0) to wait for internal .reset to finish
     setTimeout(() => {
       this.submitCount = 0;
+      this.blurred = {};
       this.dirty = {};
       this.touched = {};
       const formState = this.getFormState({ resetting: true });
@@ -299,6 +307,7 @@ export const defaultFormState = {
   errors: {},
   dirty: {},
   touched: {},
+  blurred: {},
   isDirty: false,
   isValid: undefined,
   isValidating: false,
