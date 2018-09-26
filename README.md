@@ -1,5 +1,7 @@
 # <img src='./assets/logo.jpg' width="344" alt='react-html-form' />
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/ewolfe/react-html-form.svg)](https://greenkeeper.io/)
+
 > The simplest form component for React
 
 **Notice:** This project is in beta. I'm seeking beta testers and co-authors/maintainers.
