@@ -18,7 +18,7 @@ Other React form libraries introduce patterns that aren’t very ergonomic or ha
 
 ## How react-html-form is different
 
-We keep our API surface small by pulling form state (values and errors) directly out of the DOM through the `HTMLFormElement` interface.
+We keep our API surface small by pulling form state (values and errors) directly out of the DOM through the `HTMLFormElement` interface and [Constraint Validation API](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5/Constraint_validation).
 
 ## Install
 
@@ -68,7 +68,9 @@ class MyPage extends React.Component {
     return (
       <React.Fragment>
         <Form
-          // include `WithData` to any form event handler to get the form state included for free as the second argument. The third argument is a reference to the form itself
+          // include `WithData` to any form event handler to get the
+          // form state included for free as the second argument.
+          // The third argument is a reference to the form itself
           // You can still use the standard `onSubmit` if you please
           onSubmitWithData={this.handleSubmit}
         >
