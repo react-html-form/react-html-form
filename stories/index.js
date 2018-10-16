@@ -168,6 +168,17 @@ class KitchenSink extends React.Component {
             />
           </p>
           <p>
+            <label htmlFor="handle-value-as-boolean">
+              Handle value as Boolean
+            </label>
+            <input
+              data-valueasbool
+              name="handle-value-as-boolean"
+              id="handle-value-as-boolean"
+              type="text"
+            />
+          </p>
+          <p>
             <label htmlFor="breadsticks">Number of breadsticks</label>
             <input
               data-valueasnumber
