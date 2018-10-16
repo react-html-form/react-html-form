@@ -115,6 +115,21 @@ class Form extends React.PureComponent {
         if (element.hasAttribute("data-valueasdate")) {
           values[element.name] = element.valueAsDate;
         }
+        if (element.hasAttribute("data-valueasbool")) {
+          values[element.name] = (value => {
+            if (typeof value === "string") {
+              value = value.trim();
+              return value === "false" ||
+                value === "" ||
+                value === "0" ||
+                value === "undefined" ||
+                value === "null"
+                ? false
+                : true;
+            }
+            return !!value;
+          })(element.value);
+        }
         if (element.hasAttribute("data-valueasnumber")) {
           values[element.name] = element.valueAsNumber;
         }
