@@ -1,15 +1,102 @@
 import PropTypes from "prop-types";
-import React from "react";
+import React, { SyntheticEvent, ChangeEvent, FocusEvent } from "react";
 import isEqual from "react-fast-compare";
 
-class Form extends React.PureComponent {
+type FormProps = React.PropsWithChildren<{
+  domValidation: boolean;
+  validateOnBlur: Dictionary<string>;
+  validateOnChange: Dictionary<string>;
+
+  onBlur: (event: SyntheticEvent<HTMLFormControl, "blur">) => void;
+  onChange: (event: ChangeEvent<HTMLFormControl>) => void;
+  onFocus: (event: FocusEvent<HTMLFormElement>) => void;
+  onReset: (event: SyntheticEvent<HTMLFormElement, "reset">) => void;
+  onSubmit: (event: SyntheticEvent<HTMLFormElement, "submit">) => void;
+  onData: (state: Partial<FormState>, form: HTMLFormElement) => void;
+  onChangeWithData: (
+    event: ChangeEvent<HTMLFormControl>,
+    state: Partial<FormState>,
+    form: HTMLFormElement
+  ) => void;
+  onResetWithData: (
+    event: SyntheticEvent<HTMLFormElement, "reset">,
+    state: Partial<FormState>,
+    form: HTMLFormElement
+  ) => void;
+  onSubmitWithData: (
+    event: SyntheticEvent<HTMLFormElement, "submit">,
+    state: Partial<FormState>,
+    form: HTMLFormElement
+  ) => void;
+}>;
+
+type Dictionary<T> = Record<string, T>;
+
+type FormState<Elements = Dictionary<string>> = {
+  values: Elements;
+  errors: Dictionary<string | string[]>;
+  dirty: Dictionary<boolean>;
+  touched: Dictionary<boolean>;
+
+  isValidating: boolean;
+  isDirty: boolean;
+  isValid: boolean;
+
+  submitCount: number;
+};
+
+class Form extends React.PureComponent<FormProps, FormState> {
+  form: HTMLFormElement = null;
+  isValidating = false;
+  submitCount = 0;
+  values: Dictionary<string> = {};
+  blurred: Dictionary<boolean> = {};
+  dirty: Dictionary<boolean> = {};
+  touched: Dictionary<boolean> = {};
+
+  state = {
+    values: {},
+    errors: {},
+    dirty: {},
+    touched: {},
+    isValidating: false,
+    isDirty: false,
+    isValid: false,
+    submitCount: 0
+  };
+
+  static propTypes = {
+    domValidation: PropTypes.bool,
+    onBlur: PropTypes.func,
+    onChange: PropTypes.func,
+    onChangeWithData: PropTypes.func,
+    onData: PropTypes.func,
+    onFocus: PropTypes.func,
+    onReset: PropTypes.func,
+    onResetWithData: PropTypes.func,
+    onSubmit: PropTypes.func,
+    onSubmitWithData: PropTypes.func,
+    validateOnBlur: PropTypes.object, // eslint-disable-line
+    validateOnChange: PropTypes.object // eslint-disable-line
+  };
+
+  static defaultProps = {
+    domValidation: false,
+    onBlur: () => {},
+    onChange: () => {},
+    onChangeWithData: () => {},
+    onData: () => {},
+    onFocus: () => {},
+    onReset: () => {},
+    onResetWithData: () => {},
+    onSubmit: () => {},
+    onSubmitWithData: () => {},
+    validateOnBlur: {},
+    validateOnChange: {}
+  };
+
   constructor(props) {
     super(props);
-
-    this.submitCount = 0;
-    this.blurred = {};
-    this.dirty = {};
-    this.touched = {};
 
     this.getFormState = this.getFormState.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
@@ -31,7 +118,7 @@ class Form extends React.PureComponent {
 
     // Iterate in reverse order so we can focus the first element with an error
     for (let i = this.form.elements.length - 1; i >= 0; i -= 1) {
-      const element = this.form.elements[i];
+      const element: HTMLFormControl = this.form.elements[i] as any;
 
       // Reset to a blank state
       element.setCustomValidity("");
@@ -300,36 +387,6 @@ class Form extends React.PureComponent {
     );
   }
 }
-
-Form.defaultProps = {
-  domValidation: false,
-  onBlur: () => {},
-  onChange: () => {},
-  onChangeWithData: () => {},
-  onData: () => {},
-  onFocus: () => {},
-  onReset: () => {},
-  onResetWithData: () => {},
-  onSubmit: () => {},
-  onSubmitWithData: () => {},
-  validateOnBlur: {},
-  validateOnChange: {}
-};
-
-Form.propTypes = {
-  domValidation: PropTypes.bool,
-  onBlur: PropTypes.func,
-  onChange: PropTypes.func,
-  onChangeWithData: PropTypes.func,
-  onData: PropTypes.func,
-  onFocus: PropTypes.func,
-  onReset: PropTypes.func,
-  onResetWithData: PropTypes.func,
-  onSubmit: PropTypes.func,
-  onSubmitWithData: PropTypes.func,
-  validateOnBlur: PropTypes.object, // eslint-disable-line
-  validateOnChange: PropTypes.object // eslint-disable-line
-};
 
 export default Form;
 
