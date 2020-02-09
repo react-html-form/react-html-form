@@ -47,8 +47,10 @@ type FormState<Elements = Dictionary<string>> = {
 
 class Form extends React.PureComponent<FormProps, FormState> {
   form: HTMLFormElement = null;
+
   isValidating = false;
   submitCount = 0;
+
   values: Dictionary<string> = {};
   blurred: Dictionary<boolean> = {};
   dirty: Dictionary<boolean> = {};
@@ -95,24 +97,13 @@ class Form extends React.PureComponent<FormProps, FormState> {
     validateOnChange: {}
   };
 
-  constructor(props) {
-    super(props);
-
-    this.getFormState = this.getFormState.bind(this);
-    this.handleBlur = this.handleBlur.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.handleFocus = this.handleFocus.bind(this);
-    this.handleReset = this.handleReset.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
   componentDidMount() {
     const formState = this.getFormState();
     this.values = formState.values;
     this.props.onData(formState, this.form);
   }
 
-  getFormState({ resetting, submitting } = {}) {
+  getFormState = ({ resetting, submitting } = {}) => {
     const values = {};
     const errors = {};
 
@@ -273,9 +264,9 @@ class Form extends React.PureComponent<FormProps, FormState> {
         Object.keys(errors).length === 0 && errors.constructor === Object,
       submitCount: this.submitCount
     };
-  }
+  };
 
-  async handleBlur(event) {
+  handleBlur = async event => {
     event.persist();
     this.props.onBlur(event);
 
@@ -309,9 +300,9 @@ class Form extends React.PureComponent<FormProps, FormState> {
     this.props.onData({
       isValidating: this.isValidating
     });
-  }
+  };
 
-  handleChange(event) {
+  handleChange = event => {
     const formState = this.getFormState();
     if (event.target.name) {
       this.dirty[event.target.name] = true;
@@ -320,18 +311,18 @@ class Form extends React.PureComponent<FormProps, FormState> {
     this.props.onChange(event);
     this.props.onData(formState, this.form);
     this.props.onChangeWithData(event, formState, this.form);
-  }
+  };
 
-  handleFocus(event) {
+  handleFocus = event => {
     if (event.target.name) {
       this.touched[event.target.name] = true;
     }
 
     this.props.onFocus(event);
     this.props.onData({ touched: this.touched }, this.form);
-  }
+  };
 
-  handleReset(event) {
+  handleReset = event => {
     // Wrap in setTimeout(0) to wait for internal .reset to finish
     setTimeout(() => {
       this.submitCount = 0;
@@ -344,9 +335,9 @@ class Form extends React.PureComponent<FormProps, FormState> {
       this.props.onData(formState, this.form);
       this.props.onResetWithData(event, formState, this.form);
     }, 0);
-  }
+  };
 
-  handleSubmit(event) {
+  handleSubmit = event => {
     this.submitCount += 1;
     const formState = this.getFormState({ submitting: true });
 
@@ -356,7 +347,7 @@ class Form extends React.PureComponent<FormProps, FormState> {
       event.preventDefault();
       this.props.onSubmitWithData(event, formState, this.form);
     }
-  }
+  };
 
   render() {
     const {
