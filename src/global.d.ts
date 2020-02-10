@@ -1,3 +1,5 @@
+import "";
+
 /** @note
  * We need to override HTMLFormControlsCollection because it does not treat
  * HTMLFormElement.elements as if they were a limited set */
@@ -12,7 +14,7 @@ declare global {
     [index: number]: HTMLFormControl;
   }
 
-  type HTMLFormControl = { name?: string } & (
+  type HTMLFormControl = { name?: Attr["name"] } & (
     | HTMLButtonElement
     | HTMLFieldSetElement
     | HTMLInputElement
@@ -23,5 +25,3 @@ declare global {
   // Utility Generic
   type Dictionary<T> = Record<string, T>;
 }
-
-export {};

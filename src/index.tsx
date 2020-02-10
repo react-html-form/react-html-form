@@ -1,49 +1,25 @@
 import PropTypes from "prop-types";
-import React, { SyntheticEvent, ChangeEvent, FocusEvent } from "react";
+import React, { ChangeEvent, FocusEvent, FormEvent } from "react";
 import isEqual from "react-fast-compare";
 
 type FormProps = React.PropsWithChildren<{
   domValidation: boolean;
-  validateOnBlur: Dictionary<string>;
-  validateOnChange: Dictionary<string>;
+  validateOnBlur: Dictionary<(v: string) => Promise<string>>;
+  validateOnChange: Dictionary<(v: string) => Promise<string>>;
 
-  onBlur: (event: SyntheticEvent<HTMLFormControl, "blur">) => void;
-  onChange: (event: ChangeEvent<HTMLFormControl>) => void;
-  onFocus: (event: FocusEvent<HTMLFormElement>) => void;
-  onReset: (event: SyntheticEvent<HTMLFormElement, "reset">) => void;
-  onSubmit: (event: SyntheticEvent<HTMLFormElement, "submit">) => void;
-  onData: (state: Partial<FormState>, form: HTMLFormElement) => void;
-  onChangeWithData: (
-    event: ChangeEvent<HTMLFormControl>,
-    state: Partial<FormState>,
-    form: HTMLFormElement
-  ) => void;
-  onResetWithData: (
-    event: SyntheticEvent<HTMLFormElement, "reset">,
-    state: Partial<FormState>,
-    form: HTMLFormElement
-  ) => void;
-  onSubmitWithData: (
-    event: SyntheticEvent<HTMLFormElement, "submit">,
-    state: Partial<FormState>,
-    form: HTMLFormElement
-  ) => void;
+  onBlur: FocusEventHandler;
+  onChange: ChangeEventHandler;
+  onFocus: FocusEventHandler;
+  onReset: FormEventHandler;
+  onSubmit: FormEventHandler;
+
+  onData: DataEventHandler;
+  onChangeWithData: ChangeEventHandlerWithData;
+  onResetWithData: FormEventHandlerWithData;
+  onSubmitWithData: FormEventHandlerWithData;
 }>;
 
-type Dictionary<T> = Record<string, T>;
-
-type FormState<Elements = Dictionary<string>> = {
-  values: Elements;
-  errors: Dictionary<string | string[]>;
-  dirty: Dictionary<boolean>;
-  touched: Dictionary<boolean>;
-
-  isValidating: boolean;
-  isDirty: boolean;
-  isValid: boolean;
-
-  submitCount: number;
-};
+type FormState = FormData;
 
 class Form extends React.PureComponent<FormProps, FormState> {
   form: HTMLFormElement = null;
@@ -59,6 +35,7 @@ class Form extends React.PureComponent<FormProps, FormState> {
   state = {
     values: {},
     errors: {},
+    blurred: {},
     dirty: {},
     touched: {},
     isValidating: false,
@@ -86,12 +63,12 @@ class Form extends React.PureComponent<FormProps, FormState> {
     domValidation: false,
     onBlur: () => {},
     onChange: () => {},
-    onChangeWithData: () => {},
     onData: () => {},
     onFocus: () => {},
     onReset: () => {},
-    onResetWithData: () => {},
     onSubmit: () => {},
+    onChangeWithData: () => {},
+    onResetWithData: () => {},
     onSubmitWithData: () => {},
     validateOnBlur: {},
     validateOnChange: {}
@@ -103,12 +80,18 @@ class Form extends React.PureComponent<FormProps, FormState> {
     this.props.onData(formState, this.form);
   }
 
-  getFormState = ({ resetting, submitting } = {}) => {
-    const values = {};
-    const errors = {};
+  getFormState = ({
+    resetting,
+    submitting
+  }: { resetting?: boolean; submitting?: boolean } = {}): FormState => {
+    const values: Dictionary<any> = {};
+    const errors: Dictionary<string> = {};
 
     // Iterate in reverse order so we can focus the first element with an error
     for (let i = this.form.elements.length - 1; i >= 0; i -= 1) {
+      // Using any because form.elements is typed as an array-like collection of Element
+      // but in reality there's a predefined set of possibile element types
+      // https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/elements#Value
       const element: HTMLFormControl = this.form.elements[i] as any;
 
       // Reset to a blank state
@@ -258,6 +241,7 @@ class Form extends React.PureComponent<FormProps, FormState> {
       errors,
       dirty: this.dirty,
       touched: this.touched,
+      blurred: this.blurred,
       isValidating: this.isValidating,
       isDirty,
       isValid:
@@ -266,46 +250,55 @@ class Form extends React.PureComponent<FormProps, FormState> {
     };
   };
 
-  handleBlur = async event => {
+  handleBlur: FocusEventHandler = async event => {
     event.persist();
     this.props.onBlur(event);
 
+    const target: HTMLFormControl = event.target as any;
+
     // Let the user know what’s been blurred
-    if (event.target.name) {
-      this.blurred[event.target.name] = true;
-      this.props.onData({ blurred: this.blurred });
+    if (target.name) {
+      this.blurred[target.name] = true;
+      this.props.onData({ blurred: this.blurred }, this.form);
     }
 
     // Perfom custom validation
-    const errors = {};
+    const errors: Dictionary<string> = {};
     this.isValidating = true;
-    this.props.onData({
-      isValidating: this.isValidating
-    });
-    if (this.props.validateOnBlur[event.target.name]) {
-      const errorMessage = await this.props.validateOnBlur[event.target.name](
-        event.target.value
+    this.props.onData(
+      {
+        isValidating: this.isValidating
+      },
+      this.form
+    );
+    if (this.props.validateOnBlur[target.name]) {
+      const errorMessage = await this.props.validateOnBlur[target.name](
+        target.value
       );
       if (errorMessage) {
-        event.target.setCustomValidity(errorMessage);
-        errors[event.target.name] = errorMessage;
-        this.props.onData({ errors });
+        target.setCustomValidity(errorMessage);
+        errors[target.name] = errorMessage;
+        this.props.onData({ errors }, this.form);
       } else {
-        event.target.setCustomValidity("");
-        errors[event.target.name] = undefined;
-        this.props.onData({ errors });
+        target.setCustomValidity("");
+        errors[target.name] = undefined;
+        this.props.onData({ errors }, this.form);
       }
     }
     this.isValidating = false;
-    this.props.onData({
-      isValidating: this.isValidating
-    });
+    this.props.onData(
+      {
+        isValidating: this.isValidating
+      },
+      this.form
+    );
   };
 
-  handleChange = event => {
+  handleChange: ChangeEventHandler = event => {
+    const target: HTMLFormControl = event.target as any;
     const formState = this.getFormState();
-    if (event.target.name) {
-      this.dirty[event.target.name] = true;
+    if (target.name) {
+      this.dirty[target.name] = true;
     }
 
     this.props.onChange(event);
@@ -313,16 +306,18 @@ class Form extends React.PureComponent<FormProps, FormState> {
     this.props.onChangeWithData(event, formState, this.form);
   };
 
-  handleFocus = event => {
-    if (event.target.name) {
-      this.touched[event.target.name] = true;
+  handleFocus: FocusEventHandler = event => {
+    // Only thing focusable on a form is a FormControl
+    const target: HTMLFormControl = event.target as any;
+    if (target.name) {
+      this.touched[target.name] = true;
     }
 
     this.props.onFocus(event);
     this.props.onData({ touched: this.touched }, this.form);
   };
 
-  handleReset = event => {
+  handleReset: FormEventHandler = event => {
     // Wrap in setTimeout(0) to wait for internal .reset to finish
     setTimeout(() => {
       this.submitCount = 0;
@@ -337,7 +332,7 @@ class Form extends React.PureComponent<FormProps, FormState> {
     }, 0);
   };
 
-  handleSubmit = event => {
+  handleSubmit: FormEventHandler = event => {
     this.submitCount += 1;
     const formState = this.getFormState({ submitting: true });
 
@@ -388,7 +383,44 @@ export const defaultFormState = {
   touched: {},
   blurred: {},
   isDirty: false,
-  isValid: undefined,
+  isValid: false,
   isValidating: false,
   submitCount: 0
 };
+
+type NamedFields = { [name: string]: HTMLFormControl };
+type FormFields<Fields extends NamedFields, Type> = {
+  [name in keyof Fields]: Type
+};
+
+interface FormData<Elements extends NamedFields = {}> {
+  values: Elements;
+  errors: FormFields<Elements, string>;
+  dirty: FormFields<Elements, boolean>;
+  touched: FormFields<Elements, boolean>;
+  blurred: FormFields<Elements, boolean>; // Do we need this one?
+
+  isDirty: boolean;
+  isValid: boolean;
+  isValidating: boolean;
+
+  submitCount: number;
+}
+
+type FocusEventHandler = (event: FocusEvent<HTMLFormElement>) => void;
+type ChangeEventHandler = (event: ChangeEvent<HTMLFormElement>) => void;
+type FormEventHandler = (event: FormEvent<HTMLFormElement>) => void;
+type DataEventHandler = (
+  data: Partial<FormData>,
+  form: HTMLFormElement
+) => void;
+type ChangeEventHandlerWithData = (
+  event: ChangeEvent<HTMLFormElement>,
+  data: FormData,
+  form: HTMLFormElement
+) => void;
+type FormEventHandlerWithData = (
+  event: FormEvent<HTMLFormElement>,
+  data: FormData,
+  form: HTMLFormElement
+) => void;
