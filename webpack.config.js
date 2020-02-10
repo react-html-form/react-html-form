@@ -1,7 +1,7 @@
 const path = require("path");
 
 module.exports = {
-  entry: "./src/index.js",
+  entry: "./src/index.tsx",
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "react-html-form.js",
@@ -17,6 +17,6 @@ module.exports = {
     }
   },
   module: {
-    rules: [{ test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" }]
+    rules: [{ test: /\.tsx?$/, exclude: /node_modules/, loader: "ts-loader" }]
   }
 };
