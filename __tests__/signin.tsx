@@ -1,32 +1,40 @@
 import React from "react";
-import { render, waitForDomChange } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Form from "../src/index";
 
 test("Login Test", async done => {
   const USERNAME = "jerry";
   const PASSWORD = "jerry";
-  function checkValues(_event, data, _form) {
-    expect(data.username).toBe(USERNAME);
-    expect(data.password).toBe(PASSWORD);
-    done();
+
+  function checkValues(_event, { values }, _form) {
+    try {
+      expect(values.username).toBe(USERNAME);
+      expect(values.password).toBe(PASSWORD);
+      done();
+    } catch (error) {
+      done(error);
+    }
   }
 
   const { getByLabelText, getByText } = render(
     <Form onSubmitWithData={checkValues}>
       <label htmlFor="username">
         Username:
-        <input id="username" type="text" />
+        <input name="username" id="username" type="text" />
       </label>
       <label htmlFor="password">
         Password:
-        <input id="password" type="password" />
+        <input name="password" id="password" type="password" />
       </label>
       <input type="submit" value="Submit" />
     </Form>
   );
 
-  await userEvent.type(getByLabelText("Username:"), USERNAME);
-  await userEvent.type(getByLabelText("Password:"), PASSWORD);
+  const username: HTMLInputElement = getByLabelText("Username:");
+  const password: HTMLInputElement = getByLabelText("Password:");
+
+  userEvent.type(username, USERNAME);
+  userEvent.type(password, PASSWORD);
   userEvent.click(getByText("Submit"));
 });
