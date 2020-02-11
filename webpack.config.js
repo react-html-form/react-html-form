@@ -2,6 +2,9 @@ const path = require("path");
 
 module.exports = {
   entry: "./src/index.tsx",
+  resolve: {
+    extensions: [".js", ".jsx", ".ts", "tsx"]
+  },
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "react-html-form.js",
