@@ -31,7 +31,7 @@ class KitchenSink extends React.Component {
 
   render() {
     return (
-      <React.Fragment>
+      <>
         <Form
           domValidation={false}
           onData={this.handleData}
@@ -73,8 +73,9 @@ class KitchenSink extends React.Component {
               id="name"
               type="text"
             />
-            {this.state.blurred.name &&
-              this.state.errors.name && <span>{this.state.errors.name}</span>}
+            {this.state.blurred.name && this.state.errors.name && (
+              <span>{this.state.errors.name}</span>
+            )}
           </p>
           {this.state.touched.name && (
             <p>
@@ -252,7 +253,7 @@ class KitchenSink extends React.Component {
         </Form>
         <p>Form state:</p>
         <pre>{JSON.stringify(this.state, null, 2)}</pre>
-      </React.Fragment>
+      </>
     );
   }
 }

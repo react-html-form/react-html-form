@@ -92,7 +92,7 @@ class Form extends React.PureComponent<FormProps, FormState> {
       // Using any because form.elements is typed as an array-like collection of Element
       // but in reality there's a predefined set of possibile element types
       // https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/elements#Value
-      const element: HTMLFormControl = this.form.elements[i] as any;
+      const element: any = this.form.elements[i];
 
       // Reset to a blank state
       element.setCustomValidity("");
@@ -213,19 +213,21 @@ class Form extends React.PureComponent<FormProps, FormState> {
 
       // Perform any custom validation
       if (this.props.validateOnChange[element.name]) {
-        const errorMessage = this.props.validateOnChange[element.name](
+        promisify(this.props.validateOnChange[element.name])(
           values[element.name]
-        );
-        if (errorMessage) {
-          if (this.props.domValidation) {
-            element.setCustomValidity(errorMessage);
-          } else if (submitting) {
-            element.focus();
+        ).then(errorMessage => {
+          /** @FIXME i don't think this'll update state properly from inside a promise*/
+          if (errorMessage) {
+            if (this.props.domValidation) {
+              element.setCustomValidity(errorMessage);
+            } else if (submitting) {
+              element.focus();
+            }
+            errors[element.name] = errorMessage;
+          } else {
+            element.setCustomValidity("");
           }
-          errors[element.name] = errorMessage;
-        } else {
-          element.setCustomValidity("");
-        }
+        });
       }
     }
 
@@ -254,7 +256,7 @@ class Form extends React.PureComponent<FormProps, FormState> {
     event.persist();
     this.props.onBlur(event);
 
-    const target: HTMLFormControl = event.target as any;
+    const target: any = event.target;
 
     // Let the user know what’s been blurred
     if (target.name) {
@@ -272,9 +274,9 @@ class Form extends React.PureComponent<FormProps, FormState> {
       this.form
     );
     if (this.props.validateOnBlur[target.name]) {
-      const errorMessage = await this.props.validateOnBlur[target.name](
-        target.value
-      );
+      const errorMessage = await promisify(
+        this.props.validateOnBlur[target.name]
+      )(target.value);
       if (errorMessage) {
         target.setCustomValidity(errorMessage);
         errors[target.name] = errorMessage;
@@ -390,7 +392,7 @@ export const defaultFormState = {
 
 type NamedFields = { [name: string]: HTMLFormControl };
 type FormFields<Fields extends NamedFields, Type> = {
-  [name in keyof Fields]: Type
+  [name in keyof Fields]: Type;
 };
 
 interface FormData<Elements extends NamedFields = {}> {
@@ -424,3 +426,11 @@ type FormEventHandlerWithData = (
   data: FormData,
   form: HTMLFormElement
 ) => void;
+
+function promisify(fn: Function) {
+  return function promise(...args: any[]) {
+    const result = fn.apply(null, args);
+    if (result instanceof Promise) return result;
+    else return Promise.resolve(result);
+  };
+}
