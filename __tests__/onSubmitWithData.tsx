@@ -3,7 +3,7 @@ import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Form from "../src/index";
 
-test("Login Test", async done => {
+test("Submit Login", async done => {
   const USERNAME = "jerry";
   const PASSWORD = "jerry";
 
