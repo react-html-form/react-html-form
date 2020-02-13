@@ -3,6 +3,6 @@
     "module": "commonjs",
     "jsx": "react",
     "allowSyntheticDefaultImports": true,
-    "lib": ["ES2015"]
+    "lib": ["ES2015", "DOM"]
   }
 }
