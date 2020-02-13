@@ -212,22 +212,24 @@ class Form extends React.PureComponent<FormProps, FormState> {
       }
 
       // Perform any custom validation
-      if (this.props.validateOnChange[element.name]) {
-        promisify(this.props.validateOnChange[element.name])(
-          values[element.name]
-        ).then(errorMessage => {
-          /** @FIXME i don't think this'll update state properly from inside a promise*/
-          if (errorMessage) {
-            if (this.props.domValidation) {
-              element.setCustomValidity(errorMessage);
-            } else if (submitting) {
-              element.focus();
-            }
-            errors[element.name] = errorMessage;
-          } else {
-            element.setCustomValidity("");
+      if ("function" === typeof this.props.validateOnChange[element.name]) {
+        const validate = this.props.validateOnChange[element.name];
+
+        const errorMessage = validate(values[element.name]);
+        if (errorMessage instanceof Promise) {
+          /**@FIXME
+           * there needs to be a system for handling async loading
+           * some type of pub-sub? */
+        } else if (errorMessage) {
+          if (this.props.domValidation) {
+            element.setCustomValidity(errorMessage);
+          } else if (submitting) {
+            element.focus();
           }
-        });
+          errors[element.name] = errorMessage;
+        } else {
+          element.setCustomValidity("");
+        }
       }
     }
 
@@ -273,11 +275,15 @@ class Form extends React.PureComponent<FormProps, FormState> {
       },
       this.form
     );
-    if (this.props.validateOnBlur[target.name]) {
-      const errorMessage = await promisify(
-        this.props.validateOnBlur[target.name]
-      )(target.value);
-      if (errorMessage) {
+    if ("function" === typeof this.props.validateOnBlur[target.name]) {
+      const validate = this.props.validateOnBlur[target.name];
+      const errorMessage = validate(target.value);
+
+      if (errorMessage instanceof Promise) {
+        /**@FIXME
+         * there needs to be a system for handling async loading
+         * some type of pub-sub? */
+      } else if (errorMessage) {
         target.setCustomValidity(errorMessage);
         errors[target.name] = errorMessage;
         this.props.onData({ errors }, this.form);
@@ -426,11 +432,3 @@ type FormEventHandlerWithData = (
   data: FormData,
   form: HTMLFormElement
 ) => void;
-
-function promisify(fn: Function) {
-  return function promise(...args: any[]) {
-    const result = fn.apply(null, args);
-    if (result instanceof Promise) return result;
-    else return Promise.resolve(result);
-  };
-}
