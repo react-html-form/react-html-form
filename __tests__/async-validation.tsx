@@ -100,6 +100,8 @@ test("Async Validation Race Conditions", async done => {
   done();
 });
 
+test.todo("Async Validation in Parellel Sequences");
+
 /********* HELPER FUNCTIONS *********/
 
 function resolve(value, ms = 0) {
