@@ -31,8 +31,8 @@ test("Submit Login", async done => {
     </Form>
   );
 
-  const username: HTMLInputElement = getByLabelText("Username:");
-  const password: HTMLInputElement = getByLabelText("Password:");
+  const username: HTMLInputElement = getByLabelText("Username:") as any;
+  const password: HTMLInputElement = getByLabelText("Password:") as any;
 
   userEvent.type(username, USERNAME);
   userEvent.type(password, PASSWORD);

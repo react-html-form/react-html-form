@@ -3,7 +3,7 @@ import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Form from "../src/index";
 
-test("Reset Login", async done => {
+test("Reset Empty Inputs", async done => {
   const USERNAME = "gutenbaum@example.com";
   const PASSWORD = "S3curep455w0rd";
 
@@ -32,8 +32,8 @@ test("Reset Login", async done => {
     </Form>
   );
 
-  const username: HTMLInputElement = getByLabelText("Username:");
-  const password: HTMLInputElement = getByLabelText("Password:");
+  const username: HTMLInputElement = getByLabelText("Username:") as any;
+  const password: HTMLInputElement = getByLabelText("Password:") as any;
 
   userEvent.type(username, USERNAME);
   userEvent.type(password, PASSWORD);
@@ -77,9 +77,9 @@ test("Reset Default Selection", async done => {
     </Form>
   );
 
-  const email: HTMLInputElement = getByLabelText(/email/i);
-  const phone: HTMLInputElement = getByLabelText(/phone/i);
-  const mail: HTMLInputElement = getByLabelText(/^mail$/i);
+  const email: HTMLInputElement = getByLabelText(/email/i) as any;
+  const phone: HTMLInputElement = getByLabelText(/phone/i) as any;
+  const mail: HTMLInputElement = getByLabelText(/^mail$/i) as any;
 
   expect(email.checked).toBeTruthy();
   expect(phone.checked).toBeFalsy();
