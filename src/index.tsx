@@ -2,10 +2,12 @@ import PropTypes from "prop-types";
 import React, { ChangeEvent, FocusEvent, FormEvent } from "react";
 import isEqual from "react-fast-compare";
 
+type Validator = (v: string) => string | Promise<string>;
+
 type FormProps = React.PropsWithChildren<{
   domValidation: boolean;
-  validateOnBlur: Dictionary<(v: string) => Promise<string>>;
-  validateOnChange: Dictionary<(v: string) => Promise<string>>;
+  validateOnBlur: Dictionary<Validator>;
+  validateOnChange: Dictionary<Validator>;
 
   onBlur: FocusEventHandler;
   onChange: ChangeEventHandler;
@@ -31,6 +33,7 @@ class Form extends React.PureComponent<FormProps, FormState> {
   blurred: Dictionary<boolean> = {};
   dirty: Dictionary<boolean> = {};
   touched: Dictionary<boolean> = {};
+  validators: Dictionary<any> = {};
 
   state = {
     values: {},
@@ -212,14 +215,36 @@ class Form extends React.PureComponent<FormProps, FormState> {
       }
 
       // Perform any custom validation
-      if ("function" === typeof this.props.validateOnChange[element.name]) {
+      if (
+        "function" === typeof this.props.validateOnChange[element.name] &&
+        values[element.name] !== this.values[element.name] // don't re-validate if nothing changed
+      ) {
         const validate = this.props.validateOnChange[element.name];
 
         const errorMessage = validate(values[element.name]);
         if (errorMessage instanceof Promise) {
-          /**@FIXME
-           * there needs to be a system for handling async loading
-           * some type of pub-sub? */
+          // set validating to true;
+          this.isValidating = true;
+          // clear any previous event-listeners
+
+          const stamp = Symbol(element.name);
+          // create a new listener
+          const listener = (message: string, fingerprint: Symbol) => {
+            if (fingerprint !== stamp) return;
+            element.setCustomValidity(message);
+            errors[element.name] = message;
+            this.props.onData({ errors }, this.form);
+
+            this.isValidating = Object.keys(this.validators).length > 0;
+          };
+
+          // register the listener
+          this.validators = { ...this.validators, [element.name]: listener };
+
+          // attach the listener
+          errorMessage.then(message =>
+            this.validators[element.name](message, stamp)
+          );
         } else if (errorMessage) {
           if (this.props.domValidation) {
             element.setCustomValidity(errorMessage);
@@ -280,9 +305,30 @@ class Form extends React.PureComponent<FormProps, FormState> {
       const errorMessage = validate(target.value);
 
       if (errorMessage instanceof Promise) {
-        /**@FIXME
-         * there needs to be a system for handling async loading
-         * some type of pub-sub? */
+        // clear any previous event-listeners
+        delete this.validators[target.name];
+
+        const fingerprint = Symbol();
+        // create a new listener
+        const listener = (message: string, stamp: Symbol) => {
+          if (stamp !== fingerprint) return;
+          target.setCustomValidity(message);
+          errors[target.name] = message;
+          this.props.onData({ errors }, this.form);
+          if (this.validators[target.name] === listener)
+            delete this.validators[target.name];
+
+          this.isValidating = Object.keys(this.validators).length > 0;
+        };
+
+        // register the listener
+        this.validators = { ...this.validators, [target.name]: listener };
+
+        // attach the listener
+        errorMessage.then(message => {
+          const post = this.validators[target.name];
+          if (typeof post === "function") post(message, fingerprint);
+        });
       } else if (errorMessage) {
         target.setCustomValidity(errorMessage);
         errors[target.name] = errorMessage;

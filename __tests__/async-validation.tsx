@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import Form from "../src/index";
 
 /** @FIXME currently broken in implementation */
-test.skip("Async Validation Will Execute", async done => {
+test("Async Validation Will Execute", async done => {
   const NAME = "e-mail";
   const INVALID_EMAIL = "EMAIL IS NOT VALID";
   const USED_EMAIL = "pizza@gmail.com";
@@ -67,7 +67,7 @@ test("Async Validation Race Conditions", async done => {
       value === BAD_EMAIL ? reject(`${value} failed`, 130) : resolve(value, 1)
     );
 
-  const failOnErrorInData = ({ errors }) => {
+  const failOnErrorInData = ({ errors = {} }) => {
     if (errors[NAME]) logger(FAIL_ME);
   };
   const catchAsyncError = value => {
