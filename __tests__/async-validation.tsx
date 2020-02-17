@@ -1,5 +1,5 @@
 import React from "react";
-import { render } from "@testing-library/react";
+import { render, waitForElementToBeRemoved } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Form from "../src/index";
 
@@ -100,6 +100,48 @@ test("Async Validation Race Conditions", async done => {
   done();
 });
 
+test("Async Validating flag is set", async done => {
+  const NAME = "e-mail";
+  const VALIDATION_TEXT = "(validating)";
+  const EMAIL = "pizza@email.com";
+  const timer = 150;
+  const validator = jest.fn().mockImplementation(value => {
+    // don't validate an empty string asyncronously
+    // this responsibility should fall on the user, not the library
+    if (value === "") return "";
+    else return resolve("", timer);
+  });
+
+  const { getByLabelText, getByText, queryByText } = render(
+    <StateHolder>
+      {(validating, setValidating) => (
+        <Form
+          onData={({ isValidating }) => {
+            if (typeof isValidating === "boolean") {
+              setValidating(isValidating);
+            }
+          }}
+          validateOnChange={{ [NAME]: validator }}
+        >
+          <label htmlFor={NAME}>
+            {NAME}
+            <input name={NAME} id={NAME} type="text" />
+          </label>
+          {validating && <p>{VALIDATION_TEXT}</p>}
+        </Form>
+      )}
+    </StateHolder>
+  );
+
+  const input = getByLabelText(NAME);
+  expect(queryByText(VALIDATION_TEXT)).toBeFalsy();
+  await userEvent.type(input, EMAIL);
+  getByText(VALIDATION_TEXT);
+  await waitForElementToBeRemoved(() => queryByText(VALIDATION_TEXT));
+
+  done();
+});
+
 test.todo("Async Validation in Parellel Sequences");
 
 /********* HELPER FUNCTIONS *********/
@@ -114,4 +156,9 @@ function reject(value, ms = 0) {
   return new Promise((_, reject) => {
     setTimeout(() => reject(value), ms);
   });
+}
+
+function StateHolder(props) {
+  const [state, setState] = React.useState();
+  return <div>{props.children(state, setState)}</div>;
 }

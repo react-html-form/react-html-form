@@ -33,7 +33,8 @@ class Form extends React.PureComponent<FormProps, FormState> {
   blurred: Dictionary<boolean> = {};
   dirty: Dictionary<boolean> = {};
   touched: Dictionary<boolean> = {};
-  validators: Dictionary<any> = {};
+
+  validators: Map<string, Function> = new Map();
 
   state = {
     values: {},
@@ -231,20 +232,26 @@ class Form extends React.PureComponent<FormProps, FormState> {
           // create a new listener
           const listener = (message: string, fingerprint: Symbol) => {
             if (fingerprint !== stamp) return;
+
             element.setCustomValidity(message);
             errors[element.name] = message;
-            this.props.onData({ errors }, this.form);
 
-            this.isValidating = Object.keys(this.validators).length > 0;
+            this.validators.delete(element.name);
+            this.isValidating = this.validators.size > 0;
+            this.props.onData(
+              { errors, isValidating: this.isValidating },
+              this.form
+            );
           };
 
           // register the listener
-          this.validators = { ...this.validators, [element.name]: listener };
+          this.validators.set(element.name, listener);
 
           // attach the listener
-          errorMessage.then(message =>
-            this.validators[element.name](message, stamp)
-          );
+          errorMessage.then(message => {
+            const validator = this.validators.get(element.name);
+            if (validator) validator(message, stamp);
+          });
         } else if (errorMessage) {
           if (this.props.domValidation) {
             element.setCustomValidity(errorMessage);
@@ -305,20 +312,20 @@ class Form extends React.PureComponent<FormProps, FormState> {
       const errorMessage = validate(target.value);
 
       if (errorMessage instanceof Promise) {
-        // clear any previous event-listeners
-        delete this.validators[target.name];
-
         const fingerprint = Symbol();
         // create a new listener
         const listener = (message: string, stamp: Symbol) => {
           if (stamp !== fingerprint) return;
+
           target.setCustomValidity(message);
           errors[target.name] = message;
-          this.props.onData({ errors }, this.form);
-          if (this.validators[target.name] === listener)
-            delete this.validators[target.name];
 
-          this.isValidating = Object.keys(this.validators).length > 0;
+          this.validators.delete(target.name);
+          this.isValidating = this.validators.size > 0;
+          this.props.onData(
+            { errors, isValidating: this.isValidating },
+            this.form
+          );
         };
 
         // register the listener
@@ -326,8 +333,8 @@ class Form extends React.PureComponent<FormProps, FormState> {
 
         // attach the listener
         errorMessage.then(message => {
-          const post = this.validators[target.name];
-          if (typeof post === "function") post(message, fingerprint);
+          const validator = this.validators.get(target.name);
+          if (typeof validator === "function") validator(message, fingerprint);
         });
       } else if (errorMessage) {
         target.setCustomValidity(errorMessage);
