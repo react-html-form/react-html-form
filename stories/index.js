@@ -2,7 +2,7 @@ import React from "react";
 import { storiesOf } from "@storybook/react";
 import Form, { defaultFormState } from "../src";
 
-class KitchenSink extends React.Component {
+export default class KitchenSink extends React.Component {
   constructor(props) {
     super(props);
     this.handleData = this.handleData.bind(this);
@@ -37,26 +37,22 @@ class KitchenSink extends React.Component {
           onData={this.handleData}
           onSubmitWithData={this.handleSubmit}
           validateOnBlur={{
-            email: async input => {
-              if (input === "pizza@example.com") {
-                return `Seriously, ${input} is taken`;
-              }
-              if (input === "good@example.com") {
-                return undefined;
-              }
-              const error = await new Promise(resolve => {
+            email: input => {
+              return new Promise(resolve => {
                 setTimeout(() => {
-                  resolve(
-                    `got an async error for ${input}, try 'good@example.com'`
+                  if (input === this.props.goodEmail) return resolve("");
+                  if (input === this.props.badEmail)
+                    return resolve(`Seriously, ${input} is taken`);
+                  return resolve(
+                    `got an async error for ${input}, try '${this.props.goodEmail}'`
                   );
-                }, 5000);
+                }, this.props.mockTimeout);
               });
-              return error;
             }
           }}
           validateOnChange={{
             email: input => {
-              if (input === "pizza@example.com") {
+              if (input === this.props.badEmail) {
                 return `${input} is taken`;
               }
               return undefined;
@@ -71,6 +67,7 @@ class KitchenSink extends React.Component {
                 data-errormessage="Name is required and can only include letters"
                 pattern="[A-Za-z]+"
                 name="name"
+                data-testid="name"
                 id="name"
                 type="text"
               />
@@ -83,7 +80,13 @@ class KitchenSink extends React.Component {
             <p>
               <label htmlFor="telephone">
                 Telephone:
-                <input required name="telephone" id="telephone" type="tel" />
+                <input
+                  required
+                  name="telephone"
+                  data-testid="telephone"
+                  id="telephone"
+                  type="tel"
+                />
               </label>
             </p>
           )}
@@ -93,23 +96,27 @@ class KitchenSink extends React.Component {
               <input
                 required
                 name="email"
+                data-testid="email"
                 id="email"
                 type="email"
                 onChange={() => {}}
                 value={this.state.values.email}
               />
             </label>
-            <small>
-              {this.state.isValidating && "(validating)"} (pizza@example.com is
-              not allowed)
-            </small>
+            {this.state.isValidating && <small>(validating)</small>}
+            {this.state.errors.email && (
+              <strong>{this.state.errors.email}</strong>
+            )}
           </p>
-          {this.state.errors.email && <p>{this.state.errors.email}</p>}
           <p>
-            {" "}
             <label htmlFor="variety">
               Variety:
-              <input list="variety" name="variety" id="variety" />
+              <input
+                list="variety"
+                name="variety"
+                data-testid="variety"
+                id="variety"
+              />
               <datalist>
                 {/* eslint-disable */}
                 <option value="Neapolitan" />
@@ -131,19 +138,37 @@ class KitchenSink extends React.Component {
             <p>
               <label htmlFor="small">
                 Small
-                <input id="small" type="radio" name="size" value="small" />
+                <input
+                  id="small"
+                  type="radio"
+                  name="size"
+                  data-testid="size-small"
+                  value="small"
+                />
               </label>
             </p>
             <p>
               <label htmlFor="medium">
                 Medium
-                <input id="medium" type="radio" name="size" value="medium" />
+                <input
+                  id="medium"
+                  type="radio"
+                  name="size"
+                  data-testid="size-medium"
+                  value="medium"
+                />
               </label>
             </p>
             <p>
               <label htmlFor="large">
                 Large
-                <input id="large" type="radio" name="size" value="large" />
+                <input
+                  id="large"
+                  type="radio"
+                  name="size"
+                  data-testid="size-large"
+                  value="large"
+                />
               </label>
             </p>
           </fieldset>
@@ -155,6 +180,7 @@ class KitchenSink extends React.Component {
                 <input
                   type="checkbox"
                   name="topping"
+                  data-testid="topping-bacon"
                   id="bacon"
                   value="bacon"
                 />
@@ -166,6 +192,7 @@ class KitchenSink extends React.Component {
                 <input
                   type="checkbox"
                   name="topping"
+                  data-testid="topping-extra-cheese"
                   value="extra-cheese"
                   id="extra-cheese"
                 />
@@ -177,6 +204,7 @@ class KitchenSink extends React.Component {
                 <input
                   type="checkbox"
                   name="topping"
+                  data-testid="topping-onion"
                   value="onion"
                   id="onion"
                 />
@@ -188,6 +216,7 @@ class KitchenSink extends React.Component {
                 <input
                   type="checkbox"
                   name="topping"
+                  data-testid="topping-mushroom"
                   value="mushroom"
                   id="mushroom"
                 />
@@ -200,6 +229,7 @@ class KitchenSink extends React.Component {
               <input
                 type="checkbox"
                 name="gluten-free-crust"
+                data-testid="gluten-free-crust"
                 id="gluten-free-crust"
               />
             </label>
@@ -210,6 +240,7 @@ class KitchenSink extends React.Component {
               <input
                 data-valueasbool
                 name="handle-value-as-boolean"
+                data-testid="handle-value-as-boolean"
                 id="handle-value-as-boolean"
                 type="text"
               />
@@ -222,6 +253,7 @@ class KitchenSink extends React.Component {
                 data-valueasnumber
                 type="number"
                 name="breadsticks"
+                data-testid="breadsticks"
                 id="breadsticks"
               />
             </label>
@@ -230,7 +262,13 @@ class KitchenSink extends React.Component {
             <label htmlFor="drinks">
               Drinks (cmd+click to select multiple)
               <br />
-              <select multiple id="drinks" name="drinks" size={9}>
+              <select
+                multiple
+                id="drinks"
+                name="drinks"
+                data-testid="drinks"
+                size={9}
+              >
                 <optgroup label="alcoholic">
                   <option>Beer</option>
                   <option>Wine</option>
@@ -257,6 +295,7 @@ class KitchenSink extends React.Component {
                 max="21:00"
                 step="900"
                 name="delivery-time"
+                data-testid="delivery-time"
                 id="delivery-time"
               />
             </label>
@@ -267,6 +306,7 @@ class KitchenSink extends React.Component {
               <br />
               <textarea
                 name="delivery-instructions"
+                data-testid="delivery-instructions"
                 id="delivery-instructions"
               />
             </label>
@@ -275,7 +315,13 @@ class KitchenSink extends React.Component {
             <label htmlFor="coupon">
               Coupon(s)
               <br />
-              <input multiple type="file" name="coupon(s)" id="coupon" />
+              <input
+                multiple
+                type="file"
+                name="coupon(s)"
+                data-testid="coupon(s)"
+                id="coupon"
+              />
               <br />
               <small>
                 (See console for the <code>FileList</code> object)
@@ -283,18 +329,24 @@ class KitchenSink extends React.Component {
             </label>
           </p>
           <p>
-            <input type="reset" value="Reset order" />
+            <input type="reset" value="Reset order" data-testid="reset" />
           </p>
           <p>
             <button
               type="submit"
+              data-testid="submit"
               value="Order my pizza!"
               disabled={this.state.isValidating}
             >
               Submit order
             </button>
           </p>
-          <input type="hidden" name="hidden" value={1234567890} />
+          <input
+            type="hidden"
+            name="hidden"
+            data-testid="hidden"
+            value={1234567890}
+          />
         </Form>
         <p>Form state:</p>
         <pre>{JSON.stringify(this.state, null, 2)}</pre>
@@ -303,4 +355,10 @@ class KitchenSink extends React.Component {
   }
 }
 
-storiesOf("Form", module).add("KitchenSink", () => <KitchenSink />);
+storiesOf("Form", module).add("KitchenSink", () => (
+  <KitchenSink
+    mockTimeout={5000}
+    badEmail="pizza@example.com"
+    goodEmail="good@example.com"
+  />
+));
