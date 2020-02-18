@@ -84,6 +84,48 @@ class Form extends React.PureComponent<FormProps, FormState> {
     this.props.onData(formState, this.form);
   }
 
+  registerAsyncValidator = async (
+    element: HTMLFormControl,
+    promise: Promise<string>
+  ) => {
+    const name = element.name;
+    const identifier = Symbol();
+    const handler = (message: string, fingerprint: Symbol) => {
+      // short-circuit if we already have a new listener
+      if (fingerprint !== identifier) return;
+
+      let errors: Dictionary<string> = this.state.errors;
+      if (message === "") {
+        errors = { ...errors };
+        delete errors[name];
+      } else {
+        errors[name] = message;
+      }
+
+      element.setCustomValidity(message);
+
+      this.setState({ errors });
+
+      this.validators.delete(element.name);
+      this.isValidating = this.validators.size > 0;
+
+      this.props.onData(
+        {
+          errors: this.state.errors,
+          isValidating: this.isValidating
+        },
+        this.form
+      );
+    };
+
+    this.validators.set(element.name, handler);
+
+    promise.then(message => {
+      const validator = this.validators.get(name);
+      if (validator) validator(message, identifier);
+    });
+  };
+
   getFormState = ({
     resetting,
     submitting
@@ -222,36 +264,10 @@ class Form extends React.PureComponent<FormProps, FormState> {
       ) {
         const validate = this.props.validateOnChange[element.name];
 
+        this.isValidating = true;
         const errorMessage = validate(values[element.name]);
         if (errorMessage instanceof Promise) {
-          // set validating to true;
-          this.isValidating = true;
-          // clear any previous event-listeners
-
-          const stamp = Symbol(element.name);
-          // create a new listener
-          const listener = (message: string, fingerprint: Symbol) => {
-            if (fingerprint !== stamp) return;
-
-            element.setCustomValidity(message);
-            errors[element.name] = message;
-
-            this.validators.delete(element.name);
-            this.isValidating = this.validators.size > 0;
-            this.props.onData(
-              { errors, isValidating: this.isValidating },
-              this.form
-            );
-          };
-
-          // register the listener
-          this.validators.set(element.name, listener);
-
-          // attach the listener
-          errorMessage.then(message => {
-            const validator = this.validators.get(element.name);
-            if (validator) validator(message, stamp);
-          });
+          this.registerAsyncValidator(element, errorMessage);
         } else if (errorMessage) {
           if (this.props.domValidation) {
             element.setCustomValidity(errorMessage);
@@ -262,6 +278,8 @@ class Form extends React.PureComponent<FormProps, FormState> {
         } else {
           element.setCustomValidity("");
         }
+
+        this.isValidating = this.validators.size > 0;
       }
     }
 
@@ -308,34 +326,13 @@ class Form extends React.PureComponent<FormProps, FormState> {
       this.form
     );
     if ("function" === typeof this.props.validateOnBlur[target.name]) {
+      this.isValidating = true;
+
       const validate = this.props.validateOnBlur[target.name];
       const errorMessage = validate(target.value);
 
       if (errorMessage instanceof Promise) {
-        const fingerprint = Symbol();
-        // create a new listener
-        const listener = (message: string, stamp: Symbol) => {
-          if (stamp !== fingerprint) return;
-
-          target.setCustomValidity(message);
-          errors[target.name] = message;
-
-          this.validators.delete(target.name);
-          this.isValidating = this.validators.size > 0;
-          this.props.onData(
-            { errors, isValidating: this.isValidating },
-            this.form
-          );
-        };
-
-        // register the listener
-        this.validators = { ...this.validators, [target.name]: listener };
-
-        // attach the listener
-        errorMessage.then(message => {
-          const validator = this.validators.get(target.name);
-          if (typeof validator === "function") validator(message, fingerprint);
-        });
+        this.registerAsyncValidator(target, errorMessage);
       } else if (errorMessage) {
         target.setCustomValidity(errorMessage);
         errors[target.name] = errorMessage;
@@ -346,7 +343,8 @@ class Form extends React.PureComponent<FormProps, FormState> {
         this.props.onData({ errors }, this.form);
       }
     }
-    this.isValidating = false;
+
+    this.isValidating = this.validators.size > 0;
     this.props.onData(
       {
         isValidating: this.isValidating
