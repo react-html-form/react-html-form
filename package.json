@@ -6,7 +6,7 @@
   "scripts": {
     "start": "start-storybook -p 9001 -c .storybook",
     "build": "webpack",
-    "eslint": "eslint 'src/*' 'stories/*' '.storybook/*'",
+    "eslint": "eslint 'src/*' 'stories/*' '.storybook/*' '__tests__/*'",
     "test": "jest"
   },
   "husky": {
