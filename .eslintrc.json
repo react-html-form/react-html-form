@@ -15,8 +15,30 @@
     "import/no-extraneous-dependencies": [
       "error",
       {
-        "devDependencies": [".storybook/**", "stories/**"]
+        "devDependencies": [
+          ".storybook/**",
+          "stories/**",
+          "**/__tests__/**",
+          "**/?(*.)+(spec|test).[tj]s?(x)"
+        ]
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["**/__tests__/**"],
+      "env": {
+        "jest": true,
+        "jest/globals": true
+      },
+      "plugins": ["react", "jest"],
+      "rules": {
+        "jest/no-disabled-tests": "warn",
+        "jest/no-focused-tests": "error",
+        "jest/no-identical-title": "error",
+        "jest/prefer-to-have-length": "warn",
+        "jest/valid-expect": "error"
+      }
+    }
+  ]
 }

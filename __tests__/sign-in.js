@@ -1,12 +1,12 @@
 import React from "react";
-import { render, waitForDomChange } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Form from "../src/index";
 
 test("Login Test", async done => {
   const USERNAME = "jerry";
   const PASSWORD = "jerry";
-  function checkValues(_event, data, _form) {
+  function checkValues(_event, data) {
     expect(data.values.username).toBe(USERNAME);
     expect(data.values.password).toBe(PASSWORD);
     done();
