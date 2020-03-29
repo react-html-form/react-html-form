@@ -9,6 +9,10 @@ import {
 import userEvent from "@testing-library/user-event";
 import KitchenSink from "../stories";
 
+async function clear(textInput) {
+  fireEvent.change(textInput, { target: { value: "" } });
+}
+
 beforeEach(() => {
   // since this test uses a storybook story
   // with a ton of console, just stub them all out.
@@ -58,16 +62,20 @@ test("Kitchen sink form", async done => {
   await userEvent.type(name, "JeffC");
 
   await userEvent.type(email, "test@mctest.face");
-  fireEvent.blur(email);
+  await fireEvent.blur(email);
   await waitForElement(() => getByText(/\(validating\)/i));
   await waitForElementToBeRemoved(() => getByText(/\(validating\)/i));
+  await clear(email);
+
   await userEvent.type(email, BAD_EMAIL);
-  fireEvent.blur(email);
+  await fireEvent.blur(email);
   await waitForElement(() =>
     expect(getByText(`Seriously, ${BAD_EMAIL} is taken`))
   );
+  await clear(email);
+
   await userEvent.type(email, GOOD_EMAIL);
-  fireEvent.blur(email);
+  await fireEvent.blur(email);
   await waitForElementToBeRemoved(() => getByText(/\(validating\)/i));
 
   await done();

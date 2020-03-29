@@ -1,8 +1,9 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { storiesOf } from "@storybook/react";
 import Form, { defaultFormState } from "../src";
 
-export default class KitchenSink extends React.Component {
+class KitchenSink extends React.Component {
   constructor(props) {
     super(props);
     this.handleData = this.handleData.bind(this);
@@ -10,7 +11,7 @@ export default class KitchenSink extends React.Component {
     this.state = {
       ...defaultFormState,
       values: {
-        email: "pizza@example.com"
+        email: props.badEmail
       }
     };
   }
@@ -38,25 +39,25 @@ export default class KitchenSink extends React.Component {
           onSubmitWithData={this.handleSubmit}
           validateOnBlur={{
             email: async input => {
-              if (input === "pizza@example.com") {
-                return `Seriously, ${input} is taken`;
+              if (input === this.props.badEmail) {
+                return `Seriously, ${this.props.badEmail} is taken`;
               }
-              if (input === "good@example.com") {
+              if (input === this.props.goodEmail) {
                 return undefined;
               }
               const error = await new Promise(resolve => {
                 setTimeout(() => {
                   resolve(
-                    `got an async error for ${input}, try 'good@example.com'`
+                    `got an async error for ${input}, try '${this.props.goodEmail}'`
                   );
-                }, 5000);
+                }, this.props.mockTimeout);
               });
               return error;
             }
           }}
           validateOnChange={{
             email: input => {
-              if (input === "pizza@example.com") {
+              if (input === this.props.badEmail) {
                 return `${input} is taken`;
               }
               return undefined;
@@ -74,8 +75,9 @@ export default class KitchenSink extends React.Component {
               id="name"
               type="text"
             />
-            {this.state.blurred.name &&
-              this.state.errors.name && <span>{this.state.errors.name}</span>}
+            {this.state.blurred.name && this.state.errors.name && (
+              <span>{this.state.errors.name}</span>
+            )}
           </p>
           {this.state.touched.name && (
             <p>
@@ -101,8 +103,9 @@ export default class KitchenSink extends React.Component {
               value={this.state.values.email}
             />
             <small>
-              {this.state.isValidating && "(validating)"} (pizza@example.com is
-              not allowed)
+              {`(${this.props.badEmail} is not allowed)`}
+              <br />
+              {this.state.isValidating && "(validating)"}
             </small>
           </p>
           {this.state.errors.email && <p>{this.state.errors.email}</p>}
@@ -308,5 +311,19 @@ export default class KitchenSink extends React.Component {
     );
   }
 }
+
+KitchenSink.defaultProps = {
+  mockTimeout: 5000,
+  goodEmail: "good@example.com",
+  badEmail: "pizza@example.com"
+};
+
+KitchenSink.propTypes = {
+  mockTimeout: PropTypes.number,
+  goodEmail: PropTypes.string,
+  badEmail: PropTypes.string
+};
+
+export default KitchenSink;
 
 storiesOf("Form", module).add("KitchenSink", () => <KitchenSink />);
