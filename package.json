@@ -45,13 +45,13 @@
     "husky": "^4.2.3",
     "lint-staged": "^10.0.10",
     "prettier": "^2.0.2",
-    "react": "^16.5.1",
-    "react-dom": "^16.5.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11"
   },
   "peerDependencies": {
-    "react": "^16.5.1"
+    "react": "^16.13.1"
   },
   "dependencies": {
     "prop-types": "^15.7.2",
