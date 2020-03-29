@@ -2,7 +2,7 @@ import React from "react";
 import { storiesOf } from "@storybook/react";
 import Form, { defaultFormState } from "../src";
 
-class KitchenSink extends React.Component {
+export default class KitchenSink extends React.Component {
   constructor(props) {
     super(props);
     this.handleData = this.handleData.bind(this);
@@ -31,7 +31,7 @@ class KitchenSink extends React.Component {
 
   render() {
     return (
-      <React.Fragment>
+      <>
         <Form
           domValidation={false}
           onData={this.handleData}
@@ -70,6 +70,7 @@ class KitchenSink extends React.Component {
               data-errormessage="Name is required and can only include letters"
               pattern="[A-Za-z]+"
               name="name"
+              data-testid="name"
               id="name"
               type="text"
             />
@@ -79,7 +80,13 @@ class KitchenSink extends React.Component {
           {this.state.touched.name && (
             <p>
               <label htmlFor="telephone">Telephone:</label>
-              <input required name="telephone" id="telephone" type="tel" />
+              <input
+                required
+                name="telephone"
+                data-testid="telephone"
+                id="telephone"
+                type="tel"
+              />
             </p>
           )}
           <p>
@@ -87,6 +94,7 @@ class KitchenSink extends React.Component {
             <input
               required
               name="email"
+              data-testid="email"
               id="email"
               type="email"
               onChange={() => {}}
@@ -101,7 +109,7 @@ class KitchenSink extends React.Component {
           <p>
             {" "}
             <label htmlFor="variety">Variety:</label>
-            <input list="variety" name="variety" />
+            <input list="variety" name="variety" data-testid="variety" />
             <datalist id="variety">
               <option value="Neapolitan" />
               <option value="Sicilian" />
@@ -119,41 +127,73 @@ class KitchenSink extends React.Component {
             <legend>Pizza Size</legend>
             <p>
               <label htmlFor="small">Small</label>
-              <input id="small" type="radio" name="size" value="small" />
+              <input
+                id="small"
+                type="radio"
+                name="size"
+                data-testid="size"
+                value="small"
+              />
             </p>
             <p>
               <label htmlFor="medium">Medium</label>
-              <input id="medium" type="radio" name="size" value="medium" />
+              <input
+                id="medium"
+                type="radio"
+                name="size"
+                data-testid="size"
+                value="medium"
+              />
             </p>
             <p>
               <label htmlFor="large">Large</label>
-              <input id="large" type="radio" name="size" value="large" />
+              <input
+                id="large"
+                type="radio"
+                name="size"
+                data-testid="size"
+                value="large"
+              />
             </p>
           </fieldset>
           <fieldset>
             <legend>Pizza Toppings</legend>
             <p>
               <label htmlFor="bacon">Bacon</label>
-              <input type="checkbox" name="topping" id="bacon" value="bacon" />
+              <input
+                type="checkbox"
+                name="topping"
+                data-testid="topping"
+                id="bacon"
+                value="bacon"
+              />
             </p>
             <p>
               <label htmlFor="extra-cheese">Extra Cheese</label>
               <input
                 type="checkbox"
                 name="topping"
+                data-testid="topping"
                 value="extra-cheese"
                 id="extra-cheese"
               />
             </p>
             <p>
               <label htmlFor="onion">Onion</label>
-              <input type="checkbox" name="topping" value="onion" id="onion" />
+              <input
+                type="checkbox"
+                name="topping"
+                data-testid="topping"
+                value="onion"
+                id="onion"
+              />
             </p>
             <p>
               <label htmlFor="mushroom">Mushroom</label>
               <input
                 type="checkbox"
                 name="topping"
+                data-testid="topping"
                 value="mushroom"
                 id="mushroom"
               />
@@ -184,6 +224,7 @@ class KitchenSink extends React.Component {
               data-valueasnumber
               type="number"
               name="breadsticks"
+              data-testid="breadsticks"
               id="breadsticks"
             />
           </p>
@@ -192,7 +233,13 @@ class KitchenSink extends React.Component {
               Drinks (cmd+click to select multiple)
             </label>
             <br />
-            <select multiple id="drinks" name="drinks" size={9}>
+            <select
+              multiple
+              id="drinks"
+              name="drinks"
+              data-testid="drinks"
+              size={9}
+            >
               <optgroup label="alcoholic">
                 <option>Beer</option>
                 <option>Wine</option>
@@ -248,11 +295,16 @@ class KitchenSink extends React.Component {
               Submit order
             </button>
           </p>
-          <input type="hidden" name="hidden" value={1234567890} />
+          <input
+            type="hidden"
+            name="hidden"
+            data-testid="hidden"
+            value={1234567890}
+          />
         </Form>
         <p>Form state:</p>
         <pre>{JSON.stringify(this.state, null, 2)}</pre>
-      </React.Fragment>
+      </>
     );
   }
 }
