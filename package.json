@@ -50,7 +50,7 @@
     "react": "^16.5.1"
   },
   "dependencies": {
-    "prop-types": "^15.6.2",
-    "react-fast-compare": "^2.0.2"
+    "prop-types": "^15.7.2",
+    "react-fast-compare": "^3.0.1"
   }
 }
