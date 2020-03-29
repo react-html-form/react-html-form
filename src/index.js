@@ -117,15 +117,19 @@ class Form extends React.PureComponent {
         }
         if (element.hasAttribute("data-valueasbool")) {
           values[element.name] = (value => {
+            // Look for string values that if executed in eval would be falsey
             if (typeof value === "string") {
-              value = value.trim();
-              return value === "false" ||
-                value === "" ||
-                value === "0" ||
-                value === "undefined" ||
-                value === "null"
-                ? false
-                : true;
+              const trimmed = value.trim();
+              if (
+                trimmed === "false" ||
+                trimmed === "" ||
+                trimmed === "0" ||
+                trimmed === "undefined" ||
+                trimmed === "null"
+              ) {
+                return false;
+              }
+              return true;
             }
             return !!value;
           })(element.value);
@@ -317,6 +321,7 @@ Form.defaultProps = {
 };
 
 Form.propTypes = {
+  children: PropTypes.node.isRequired,
   domValidation: PropTypes.bool,
   onBlur: PropTypes.func,
   onChange: PropTypes.func,
