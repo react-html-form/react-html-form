@@ -76,7 +76,8 @@ test("Kitchen sink form", async done => {
 
   await userEvent.type(email, GOOD_EMAIL);
   await fireEvent.blur(email);
+  await waitForElement(() => getByText(/\(validating\)/i));
   await waitForElementToBeRemoved(() => getByText(/\(validating\)/i));
 
-  await done();
+  await await done();
 });

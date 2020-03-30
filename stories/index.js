@@ -38,22 +38,19 @@ class KitchenSink extends React.Component {
           onData={this.handleData}
           onSubmitWithData={this.handleSubmit}
           validateOnBlur={{
-            email: async input => {
-              if (input === this.props.badEmail) {
-                return `Seriously, ${this.props.badEmail} is taken`;
-              }
-              if (input === this.props.goodEmail) {
-                return undefined;
-              }
-              const error = await new Promise(resolve => {
+            email: async input =>
+              new Promise(resolve => {
                 setTimeout(() => {
-                  resolve(
+                  if (input === this.props.goodEmail) return resolve();
+                  if (input === this.props.badEmail)
+                    return resolve(
+                      `Seriously, ${this.props.badEmail} is taken`
+                    );
+                  return resolve(
                     `got an async error for ${input}, try '${this.props.goodEmail}'`
                   );
                 }, this.props.mockTimeout);
-              });
-              return error;
-            }
+              })
           }}
           validateOnChange={{
             email: input => {
@@ -312,18 +309,18 @@ class KitchenSink extends React.Component {
   }
 }
 
-KitchenSink.defaultProps = {
-  mockTimeout: 5000,
-  goodEmail: "good@example.com",
-  badEmail: "pizza@example.com"
-};
-
 KitchenSink.propTypes = {
-  mockTimeout: PropTypes.number,
-  goodEmail: PropTypes.string,
-  badEmail: PropTypes.string
+  mockTimeout: PropTypes.number.isRequired,
+  goodEmail: PropTypes.string.isRequired,
+  badEmail: PropTypes.string.isRequired
 };
 
 export default KitchenSink;
 
-storiesOf("Form", module).add("KitchenSink", () => <KitchenSink />);
+storiesOf("Form", module).add("KitchenSink", () => (
+  <KitchenSink
+    mockTimeout={5000}
+    goodEmail="good@example.com"
+    badEmail="pizza@example.com"
+  />
+));
