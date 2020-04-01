@@ -49,13 +49,13 @@ test("File Input", async done => {
       onFocus={handleFocus}
     >
       <label htmlFor={NAME}>
-        Input here
+        Choose file:
         <input id={NAME} name={NAME} type="file" />
       </label>
     </Form>
   );
 
-  const input = getByLabelText(/input here/i);
+  const input = getByLabelText(/choose file/i);
   expect(input.value).toBe("");
 
   fireEvent.focus(input);
