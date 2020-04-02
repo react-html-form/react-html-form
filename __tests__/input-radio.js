@@ -27,7 +27,7 @@ beforeEach(() => {
   handleSubmitWithData.mockReset();
 });
 
-test("Checkbox Input Group", async done => {
+test("Radio Input Group", async done => {
   const OPT_EMAIL = "Email";
   const OPT_PHONE = "Phone";
   const OPT_MAIL = "Mail";
