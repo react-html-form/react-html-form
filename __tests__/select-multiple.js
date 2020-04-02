@@ -47,6 +47,48 @@ test("Select Input", done => {
   const { getByLabelText } = render(
     <Form onData={handleData}>
       <label htmlFor={NAME}>{NAME}</label>
+      <select id={NAME} name={NAME} data-testid={NAME} size={9}>
+        <optgroup label="alcoholic">
+          <option>{BEER}</option>
+          <option>{WINE}</option>
+          <option>{WHISKEY}</option>
+        </optgroup>
+        <optgroup label="non-alcoholic">
+          <option>{COFFEE}</option>
+          <option>{SODA}</option>
+          <option>{WATER}</option>
+          <option>{TEA}</option>
+        </optgroup>
+      </select>
+    </Form>
+  );
+
+  const select = getByLabelText(NAME);
+
+  userEvent.selectOptions(select, [WHISKEY]);
+  expect(dataReader).toHaveBeenCalledWith(WHISKEY);
+
+  userEvent.selectOptions(select, [WHISKEY]);
+  userEvent.selectOptions(select, [WINE]);
+  userEvent.selectOptions(select, [WATER]);
+  expect(dataReader).toHaveBeenLastCalledWith(WATER);
+
+  done();
+});
+
+test("Select Multiple Input", done => {
+  const handleData = state => {
+    try {
+      // HANDLE CHANGE
+      dataReader(state.values[NAME]);
+    } catch (error) {
+      // drop it
+    }
+  };
+
+  const { getByLabelText } = render(
+    <Form onData={handleData}>
+      <label htmlFor={NAME}>{NAME}</label>
       <select multiple id={NAME} name={NAME} data-testid={NAME} size={9}>
         <optgroup label="alcoholic">
           <option>{BEER}</option>
