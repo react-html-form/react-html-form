@@ -32,7 +32,9 @@ afterEach(() => {
   window.alert.mockRestore();
 });
 
-test("Kitchen sink form", async done => {
+/** @note want to know coverage is good without this test */
+// eslint-disable-next-line
+xtest("Kitchen sink form", async done => {
   const GOOD_EMAIL = "good@example.com";
   const BAD_EMAIL = "pizza@badpizza.com";
   const { getByTestId, getByText } = render(
