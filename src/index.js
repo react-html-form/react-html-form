@@ -113,7 +113,11 @@ class Form extends React.PureComponent {
         // Important, valueAsNumber should always override valueAsDate
         // see https://www.w3.org/TR/2011/WD-html5-20110405/common-input-element-attributes.html
         if (element.hasAttribute("data-valueasdate")) {
-          values[element.name] = element.valueAsDate;
+          if ("valueAsDate" in element) {
+            values[element.name] = element.valueAsDate;
+          } else {
+            values[element.name] = new Date(element.value);
+          }
         }
         if (element.hasAttribute("data-valueasbool")) {
           values[element.name] = (value => {
