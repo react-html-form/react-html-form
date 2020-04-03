@@ -13,25 +13,9 @@ const TEA = "tea";
 const COFFEE = "coffee";
 
 const dataReader = jest.fn();
-const handleBlur = jest.fn();
-const handleChange = jest.fn();
-const handleChangeWithData = jest.fn();
-const handleFocus = jest.fn();
-const handleReset = jest.fn();
-const handleResetWithData = jest.fn();
-const handleSubmit = jest.fn();
-const handleSubmitWithData = jest.fn();
 
 beforeEach(() => {
   dataReader.mockReset();
-  handleBlur.mockReset();
-  handleChange.mockReset();
-  handleChangeWithData.mockReset();
-  handleFocus.mockReset();
-  handleReset.mockReset();
-  handleResetWithData.mockReset();
-  handleSubmit.mockReset();
-  handleSubmitWithData.mockReset();
 });
 
 test("Select Input", done => {
