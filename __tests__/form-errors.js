@@ -10,8 +10,7 @@ import Form from "../src/index";
 
 const NAME = "input";
 const ERROR_MESSAGE = "Not a color";
-const REGEXP_PATTERN = "^#[a-f0-9]+$";
-const REGEXP = new RegExp(REGEXP_PATTERN);
+const REGEXP = /^#[a-f0-9]+$/;
 const USER_INPUT = "#dadb0dy";
 
 const dataReader = jest.fn();
@@ -49,7 +48,7 @@ test("HTMLElement constraints cause form error", async done => {
     <Form onReset={handleReset} onData={handleData}>
       <label htmlFor={NAME}>
         Input here
-        <input id={NAME} name={NAME} type="text" pattern={REGEXP_PATTERN} />
+        <input id={NAME} name={NAME} type="text" pattern={REGEXP.toString()} />
       </label>
     </Form>
   );
