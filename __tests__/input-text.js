@@ -158,4 +158,33 @@ test("Input Validation onBlur", async done => {
   done();
 });
 
+test("Text input handles `valueasbool`", async done => {
+  const FALSE = "false";
+
+  const { getByLabelText } = render(
+    <Form
+      onData={({ values = {} }) => {
+        dataReader(values[NAME]);
+      }}
+    >
+      <label htmlFor={NAME}>
+        {NAME}
+        <input type="text" id={NAME} name={NAME} data-valueasbool />
+      </label>
+    </Form>
+  );
+
+  const input = getByLabelText(NAME);
+
+  await userEvent.type(input, FALSE);
+
+  expect(dataReader).toHaveBeenLastCalledWith(false);
+
+  await fireEvent.change(input, { target: { value: FALSE + 1 } });
+
+  expect(dataReader).toHaveBeenLastCalledWith(true);
+
+  done();
+});
+
 test.todo("Async Input Validation onBlur");
