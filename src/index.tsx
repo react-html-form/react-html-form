@@ -1,8 +1,40 @@
 import PropTypes from "prop-types";
-import React from "react";
+import React, { ChangeEvent } from "react";
 import isEqual from "react-fast-compare";
 
-class Form extends React.PureComponent {
+type FormProps = {
+  onBlur: (event: FocusEvent) => void;
+  onChange: (event: ChangeEvent) => void;
+  onChangeWithData: (
+    event: ChangeEvent,
+    formState: any,
+    form: HTMLFormElement
+  ) => void;
+  onData: (formState: any, form: HTMLFormElement) => void;
+  onFocus: (event: FocusEvent) => void;
+  onReset: (event: Event) => void;
+  onResetWithData: (
+    event: Event,
+    formState: any,
+    form: HTMLFormElement
+  ) => void;
+  onSubmit: (event: Event) => void;
+  onSubmitWithData: (
+    event: Event,
+    formState: any,
+    form: HTMLFormElement
+  ) => void;
+} & {
+  domValidation: boolean;
+  validateOnBlur: {
+    [name: string]: (value: string) => string | Promise<string>;
+  };
+  validateOnChange: {
+    [name: string]: (value: string) => string | Promise<string>;
+  };
+};
+
+class Form extends React.PureComponent<FormProps> {
   static defaultProps = {
     domValidation: false,
     onBlur: () => {},
@@ -218,7 +250,7 @@ class Form extends React.PureComponent {
     };
   };
 
-  handleBlur = async event => {
+  handleBlur = async (event: FocusEvent) => {
     event.persist();
     this.props.onBlur(event);
 
@@ -254,7 +286,7 @@ class Form extends React.PureComponent {
     });
   };
 
-  handleChange = event => {
+  handleChange = (event: ChangeEvent) => {
     const formState = this.getFormState();
     if (event.target.name) {
       this.dirty[event.target.name] = true;
@@ -265,7 +297,7 @@ class Form extends React.PureComponent {
     this.props.onChangeWithData(event, formState, this.form);
   };
 
-  handleFocus = event => {
+  handleFocus = (event: FocusEvent) => {
     if (event.target.name) {
       this.touched[event.target.name] = true;
     }
@@ -274,7 +306,7 @@ class Form extends React.PureComponent {
     this.props.onData({ touched: this.touched }, this.form);
   };
 
-  handleReset = event => {
+  handleReset = (event: Event) => {
     // Wrap in setTimeout(0) to wait for internal .reset to finish
     setTimeout(() => {
       this.submitCount = 0;
@@ -289,7 +321,7 @@ class Form extends React.PureComponent {
     }, 0);
   };
 
-  handleSubmit = event => {
+  handleSubmit = (event: Event) => {
     this.submitCount += 1;
     const formState = this.getFormState({ submitting: true });
 
