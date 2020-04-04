@@ -34,13 +34,14 @@ class Form extends React.PureComponent {
     validateOnChange: PropTypes.object // eslint-disable-line
   };
 
+  submitCount = 0;
+  values = {};
+  blurred = {};
+  dirty = {};
+  touched = {};
+
   constructor(props) {
     super(props);
-
-    this.submitCount = 0;
-    this.blurred = {};
-    this.dirty = {};
-    this.touched = {};
 
     this.getFormState = this.getFormState.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
