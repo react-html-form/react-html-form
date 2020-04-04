@@ -3,6 +3,37 @@ import React from "react";
 import isEqual from "react-fast-compare";
 
 class Form extends React.PureComponent {
+  static defaultProps = {
+    domValidation: false,
+    onBlur: () => {},
+    onChange: () => {},
+    onChangeWithData: () => {},
+    onData: () => {},
+    onFocus: () => {},
+    onReset: () => {},
+    onResetWithData: () => {},
+    onSubmit: () => {},
+    onSubmitWithData: () => {},
+    validateOnBlur: {},
+    validateOnChange: {}
+  };
+
+  static propTypes = {
+    children: PropTypes.node.isRequired,
+    domValidation: PropTypes.bool,
+    onBlur: PropTypes.func,
+    onChange: PropTypes.func,
+    onChangeWithData: PropTypes.func,
+    onData: PropTypes.func,
+    onFocus: PropTypes.func,
+    onReset: PropTypes.func,
+    onResetWithData: PropTypes.func,
+    onSubmit: PropTypes.func,
+    onSubmitWithData: PropTypes.func,
+    validateOnBlur: PropTypes.object, // eslint-disable-line
+    validateOnChange: PropTypes.object // eslint-disable-line
+  };
+
   constructor(props) {
     super(props);
 
@@ -309,37 +340,6 @@ class Form extends React.PureComponent {
     );
   }
 }
-
-Form.defaultProps = {
-  domValidation: false,
-  onBlur: () => {},
-  onChange: () => {},
-  onChangeWithData: () => {},
-  onData: () => {},
-  onFocus: () => {},
-  onReset: () => {},
-  onResetWithData: () => {},
-  onSubmit: () => {},
-  onSubmitWithData: () => {},
-  validateOnBlur: {},
-  validateOnChange: {}
-};
-
-Form.propTypes = {
-  children: PropTypes.node.isRequired,
-  domValidation: PropTypes.bool,
-  onBlur: PropTypes.func,
-  onChange: PropTypes.func,
-  onChangeWithData: PropTypes.func,
-  onData: PropTypes.func,
-  onFocus: PropTypes.func,
-  onReset: PropTypes.func,
-  onResetWithData: PropTypes.func,
-  onSubmit: PropTypes.func,
-  onSubmitWithData: PropTypes.func,
-  validateOnBlur: PropTypes.object, // eslint-disable-line
-  validateOnChange: PropTypes.object // eslint-disable-line
-};
 
 export default Form;
 
