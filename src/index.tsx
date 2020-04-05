@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React, { ChangeEvent, FocusEvent } from "react";
+import React, { ChangeEvent, FocusEvent, FormEvent } from "react";
 import isEqual from "react-fast-compare";
 
 type FieldValue =
@@ -12,23 +12,23 @@ type FieldValue =
 
 type FormProps = {
   onBlur: (event: FocusEvent) => void;
-  onChange: (event: ChangeEvent) => void;
+  onChange: (event: FormEvent) => void;
   onChangeWithData: (
-    event: ChangeEvent,
+    event: FormEvent,
     formState: any,
     form: HTMLFormElement
   ) => void;
   onData: (formState: any, form: HTMLFormElement) => void;
   onFocus: (event: FocusEvent) => void;
-  onReset: (event: Event) => void;
+  onReset: (event: FormEvent) => void;
   onResetWithData: (
-    event: Event,
+    event: FormEvent,
     formState: any,
     form: HTMLFormElement
   ) => void;
-  onSubmit: (event: Event) => void;
+  onSubmit: (event: FormEvent) => void;
   onSubmitWithData: (
-    event: Event,
+    event: FormEvent,
     formState: any,
     form: HTMLFormElement
   ) => void;
@@ -297,46 +297,60 @@ class Form extends React.PureComponent<FormProps> {
   };
 
   handleBlur = async (event: FocusEvent) => {
-    event.persist();
+    const target = event.target as HTMLFormControl;
+    if (!("name" in target)) return;
+
     this.props.onBlur(event);
 
     // Let the user know what’s been blurred
-    if (event.target.name) {
-      this.blurred[event.target.name] = true;
-      this.props.onData({ blurred: this.blurred });
+    if (target.name) {
+      this.blurred[target.name] = true;
+      this.props.onData({ blurred: this.blurred }, this.form);
     }
 
     // Perfom custom validation
-    const errors = {};
     this.isValidating = true;
-    this.props.onData({
-      isValidating: this.isValidating
-    });
-    if (this.props.validateOnBlur[event.target.name]) {
-      const errorMessage = await this.props.validateOnBlur[event.target.name](
-        event.target.value
+    this.props.onData({ isValidating: this.isValidating }, this.form);
+
+    if (this.props.validateOnBlur[target.name]) {
+      event.persist();
+      const errorMessage = this.props.validateOnBlur[target.name](
+        (target as HTMLInputElement).value
       );
-      if (errorMessage) {
-        event.target.setCustomValidity(errorMessage);
-        errors[event.target.name] = errorMessage;
-        this.props.onData({ errors });
+
+      if (errorMessage instanceof Promise) {
+        errorMessage.then(message => {
+          const errors: Dictionary<string> = {};
+          target.setCustomValidity(message);
+          errors[target.name] = message;
+          this.props.onData({ errors }, this.form);
+        });
+      } else if (errorMessage) {
+        const errors: Dictionary<string> = {};
+        target.setCustomValidity(errorMessage);
+        errors[target.name] = errorMessage;
+        this.props.onData({ errors }, this.form);
       } else {
-        event.target.setCustomValidity("");
-        errors[event.target.name] = undefined;
-        this.props.onData({ errors });
+        target.setCustomValidity("");
+        this.props.onData({ errors: {} }, this.form);
       }
     }
     this.isValidating = false;
-    this.props.onData({
-      isValidating: this.isValidating
-    });
+    this.props.onData(
+      {
+        isValidating: this.isValidating
+      },
+      this.form
+    );
   };
 
-  handleChange = (event: ChangeEvent) => {
+  handleChange = (event: FormEvent) => {
+    const target = event.target as HTMLFormControl;
+    if (!("name" in target)) return;
+
     const formState = this.getFormState();
-    if (event.target.name) {
-      this.dirty[event.target.name] = true;
-    }
+
+    this.dirty[target.name] = true;
 
     this.props.onChange(event);
     this.props.onData(formState, this.form);
@@ -344,15 +358,16 @@ class Form extends React.PureComponent<FormProps> {
   };
 
   handleFocus = (event: FocusEvent) => {
-    if (event.target.name) {
-      this.touched[event.target.name] = true;
-    }
+    const target = event.target as HTMLFormControl;
+    if (!("name" in target)) return;
+
+    this.touched[target.name] = true;
 
     this.props.onFocus(event);
     this.props.onData({ touched: this.touched }, this.form);
   };
 
-  handleReset = (event: Event) => {
+  handleReset = (event: FormEvent) => {
     // Wrap in setTimeout(0) to wait for internal .reset to finish
     setTimeout(() => {
       this.submitCount = 0;
@@ -367,7 +382,7 @@ class Form extends React.PureComponent<FormProps> {
     }, 0);
   };
 
-  handleSubmit = (event: Event) => {
+  handleSubmit = (event: FormEvent) => {
     this.submitCount += 1;
     const formState = this.getFormState({ submitting: true });
 
@@ -418,7 +433,7 @@ export const defaultFormState = {
   touched: {},
   blurred: {},
   isDirty: false,
-  isValid: undefined,
+  isValid: false,
   isValidating: false,
   submitCount: 0
 };
