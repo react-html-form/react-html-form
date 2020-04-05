@@ -2,6 +2,14 @@ import PropTypes from "prop-types";
 import React, { ChangeEvent, FocusEvent } from "react";
 import isEqual from "react-fast-compare";
 
+type FieldValue =
+  | boolean
+  | number
+  | Date
+  | string
+  | string[]
+  | { value: string; files: string[] };
+
 type FormProps = {
   onBlur: (event: FocusEvent) => void;
   onChange: (event: ChangeEvent) => void;
@@ -27,10 +35,10 @@ type FormProps = {
 } & {
   domValidation: boolean;
   validateOnBlur: {
-    [name: string]: (value: string) => string | Promise<string>;
+    [name: string]: (value: FieldValue) => string | Promise<string>;
   };
   validateOnChange: {
-    [name: string]: (value: string) => string | Promise<string>;
+    [name: string]: (value: FieldValue) => string | Promise<string>;
   };
 };
 
@@ -67,9 +75,7 @@ class Form extends React.PureComponent<FormProps> {
   };
 
   submitCount = 0;
-  values: Dictionary<
-    string | string[] | { value: string; files: string[] }
-  > = {};
+  values: Dictionary<FieldValue> = {};
   blurred: Dictionary<boolean> = {};
   dirty: Dictionary<boolean> = {};
   touched: Dictionary<boolean> = {};
@@ -86,9 +92,7 @@ class Form extends React.PureComponent<FormProps> {
     resetting,
     submitting
   }: { resetting?: boolean; submitting?: boolean } = {}) => {
-    const values: Dictionary<
-      string | string[] | { value: string; files: string[] }
-    > = {};
+    const values: Dictionary<FieldValue> = {};
     const errors: Dictionary<string> = {};
 
     // Iterate in reverse order so we can focus the first element with an error
@@ -108,7 +112,10 @@ class Form extends React.PureComponent<FormProps> {
       if (resetting) {
         // Set the value to the original value when the component was mounted
         if (this.values[element.name]) {
-          element.defaultValue = this.values[element.name];
+          /** @fixme this should be behind a guard for HTMLInputElement */
+          (element as HTMLInputElement).defaultValue = this.values[
+            element.name
+          ] as string;
           element.checkValidity(); // recheck the validity, order here is important
         }
 
@@ -122,16 +129,18 @@ class Form extends React.PureComponent<FormProps> {
       switch (element.type) {
         case "file":
           values[element.name] = {
-            value: element.value,
-            files: element.files
+            value: (element as HTMLInputElement).value,
+            files: [].concat((element as HTMLInputElement).files)
           };
           break;
         case "checkbox":
           if (!values[element.name]) {
-            if (element.checked) {
+            if ((element as HTMLInputElement).checked) {
               values[element.name] =
-                element.value === "on" ? true : element.value;
-            } else if (element.indeterminate) {
+                (element as HTMLInputElement).value === "on"
+                  ? true
+                  : (element as HTMLInputElement).value;
+            } else if ((element as HTMLInputElement).indeterminate) {
               values[element.name] = undefined;
             } else {
               values[element.name] = false;
@@ -140,17 +149,22 @@ class Form extends React.PureComponent<FormProps> {
             // Convert to an array of values since we're probably in a fieldset
             // (Or at least, the user has declared multiple checkboxes with the same name)
             if (!Array.isArray(values[element.name])) {
-              values[element.name] = new Array(values[element.name]);
+              values[element.name] = [].concat(
+                values[element.name] as string[]
+              );
             }
-            if (element.checked) {
-              values[element.name].push(element.value);
+
+            if ((element as HTMLInputElement).checked) {
+              (values[element.name] as string[]).push(
+                (element as HTMLInputElement).value
+              );
             }
           }
           break;
         case "radio":
-          if (element.checked) {
-            values[element.name] = element.value;
-          } else if (element.indeterminate) {
+          if ((element as HTMLInputElement).checked) {
+            values[element.name] = (element as HTMLInputElement).value;
+          } else if ((element as HTMLInputElement).indeterminate) {
             values[element.name] = undefined;
           }
           break;
@@ -169,21 +183,29 @@ class Form extends React.PureComponent<FormProps> {
           }
           break;
         default:
-          values[element.name] = element.value;
+          values[element.name] = (element as any).value;
       }
 
       // Override our value in case the user has supplied `data-valueasdate` or 'data-valueasnumber` attribute
       // Important, valueAsNumber should always override valueAsDate
       // see https://www.w3.org/TR/2011/WD-html5-20110405/common-input-element-attributes.html
-      if (element.hasAttribute("data-valueasdate")) {
+      if (
+        element instanceof HTMLInputElement &&
+        element.hasAttribute("data-valueasdate")
+      ) {
         if ("valueAsDate" in element) {
           values[element.name] = element.valueAsDate;
         } else {
           values[element.name] = new Date(element.value);
         }
       }
-      if (element.hasAttribute("data-valueasbool")) {
+
+      if (
+        element instanceof HTMLInputElement &&
+        element.hasAttribute("data-valueasbool")
+      ) {
         values[element.name] = (value => {
+          /** @fixme I don't think it's possible to have a non-string value */
           // Look for string values that if executed in eval would be falsey
           if (typeof value === "string") {
             const trimmed = value.trim();
@@ -202,7 +224,10 @@ class Form extends React.PureComponent<FormProps> {
           return !!value;
         })(element.value);
       }
-      if (element.hasAttribute("data-valueasnumber")) {
+      if (
+        element instanceof HTMLInputElement &&
+        element.hasAttribute("data-valueasnumber")
+      ) {
         values[element.name] = element.valueAsNumber;
       }
 
@@ -226,7 +251,19 @@ class Form extends React.PureComponent<FormProps> {
         const errorMessage = this.props.validateOnChange[element.name](
           values[element.name]
         );
-        if (errorMessage) {
+        if (errorMessage instanceof Promise) {
+          if (this.props.domValidation) {
+            errorMessage.then(message => {
+              element.setCustomValidity(message);
+              errors[element.name] = message;
+            });
+          } else if (submitting) {
+            errorMessage.then(message => {
+              element.focus();
+              errors[element.name] = message;
+            });
+          }
+        } else if (errorMessage) {
           if (this.props.domValidation) {
             element.setCustomValidity(errorMessage);
           } else if (submitting) {
