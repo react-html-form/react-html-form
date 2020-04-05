@@ -2,6 +2,7 @@
   "compilerOptions": {
     "typeRoots": ["./node_modules/@types", "./src"],
     "outDir": "./dist/",
+    "declaration": true,
     "noImplicitAny": true,
     "allowSyntheticDefaultImports": true,
     "module": "es6",

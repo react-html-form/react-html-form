@@ -2,6 +2,7 @@
   "name": "react-html-form",
   "version": "0.0.0-beta.2",
   "main": "dist/react-html-form.js",
+  "types": "dist/src/index.d.ts",
   "module": "src/index.js",
   "scripts": {
     "start": "start-storybook -p 9001 -c .storybook",

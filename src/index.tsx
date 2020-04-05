@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React, { ChangeEvent, FocusEvent, FormEvent } from "react";
+import React, { FocusEvent, FormEvent } from "react";
 import isEqual from "react-fast-compare";
 
 type FieldValue =
@@ -9,6 +9,8 @@ type FieldValue =
   | string
   | string[]
   | { value: string; files: string[] };
+
+type Dictionary<T> = Record<string, T>;
 
 type FormProps = {
   onBlur: (event: FocusEvent) => void;

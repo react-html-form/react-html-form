@@ -22,7 +22,4 @@ declare global {
     | HTMLSelectElement
     | HTMLTextAreaElement
   );
-
-  // Utility Generic
-  type Dictionary<T> = Record<string, T>;
 }
