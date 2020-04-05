@@ -1,6 +1,6 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
-import Form from "../src/index";
+import Form from "../src/index.tsx";
 
 const NAME = "input";
 const dataReader = jest.fn();

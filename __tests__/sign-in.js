@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import Form from "../src/index";
+import Form from "../src/index.tsx";
 
 test("Login Test", async done => {
   const USERNAME = "jerry";
