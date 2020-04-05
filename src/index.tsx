@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, FocusEvent } from "react";
 import isEqual from "react-fast-compare";
 
 type FormProps = {
@@ -67,10 +67,14 @@ class Form extends React.PureComponent<FormProps> {
   };
 
   submitCount = 0;
-  values = {};
-  blurred = {};
-  dirty = {};
-  touched = {};
+  values: Dictionary<
+    string | string[] | { value: string; files: string[] }
+  > = {};
+  blurred: Dictionary<boolean> = {};
+  dirty: Dictionary<boolean> = {};
+  touched: Dictionary<boolean> = {};
+  isValidating = false;
+  form: HTMLFormElement;
 
   componentDidMount() {
     const formState = this.getFormState();
@@ -78,9 +82,14 @@ class Form extends React.PureComponent<FormProps> {
     this.props.onData(formState, this.form);
   }
 
-  getFormState = ({ resetting, submitting } = {}) => {
-    const values = {};
-    const errors = {};
+  getFormState = ({
+    resetting,
+    submitting
+  }: { resetting?: boolean; submitting?: boolean } = {}) => {
+    const values: Dictionary<
+      string | string[] | { value: string; files: string[] }
+    > = {};
+    const errors: Dictionary<string> = {};
 
     // Iterate in reverse order so we can focus the first element with an error
     for (let i = this.form.elements.length - 1; i >= 0; i -= 1) {
