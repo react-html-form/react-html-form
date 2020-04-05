@@ -95,115 +95,115 @@ class Form extends React.PureComponent<FormProps> {
     for (let i = this.form.elements.length - 1; i >= 0; i -= 1) {
       const element = this.form.elements[i];
 
+      // button's don't have values we can use
+      if (element instanceof HTMLButtonElement) continue;
+
+      // element's without name's cannot be stored
+      if (!element.name) continue;
+
       // Reset to a blank state
       element.setCustomValidity("");
 
-      // Save the value
-      if (element.name) {
-        // Placeholders for select-multiple
-        const elementOptions = element.options;
-        const elementValues = [];
-
-        // Piggy back off this for-loop when calling onReset
-        if (resetting) {
-          // Set the value to the original value when the component was mounted
-          if (this.values[element.name]) {
-            element.defaultValue = this.values[element.name];
-            element.checkValidity(); // recheck the validity, order here is important
-          }
-
-          // If the input wasn't there when we rendered the component
-          // we remove it from the values object
-          if (
-            !Object.prototype.hasOwnProperty.call(this.values, element.name)
-          ) {
-            delete values[element.name];
-          }
+      // Piggy back off this for-loop when calling onReset
+      if (resetting) {
+        // Set the value to the original value when the component was mounted
+        if (this.values[element.name]) {
+          element.defaultValue = this.values[element.name];
+          element.checkValidity(); // recheck the validity, order here is important
         }
 
-        switch (element.type) {
-          case "file":
-            values[element.name] = {
-              value: element.value,
-              files: element.files
-            };
-            break;
-          case "checkbox":
-            if (!values[element.name]) {
-              if (element.checked) {
-                values[element.name] =
-                  element.value === "on" ? true : element.value;
-              } else if (element.indeterminate) {
-                values[element.name] = undefined;
-              } else {
-                values[element.name] = false;
-              }
-            } else {
-              // Convert to an array of values since we're probably in a fieldset
-              // (Or at least, the user has declared multiple checkboxes with the same name)
-              if (!Array.isArray(values[element.name])) {
-                values[element.name] = new Array(values[element.name]);
-              }
-              if (element.checked) {
-                values[element.name].push(element.value);
-              }
-            }
-            break;
-          case "radio":
+        // If the input wasn't there when we rendered the component
+        // we remove it from the values object
+        if (!Object.prototype.hasOwnProperty.call(this.values, element.name)) {
+          delete values[element.name];
+        }
+      }
+
+      switch (element.type) {
+        case "file":
+          values[element.name] = {
+            value: element.value,
+            files: element.files
+          };
+          break;
+        case "checkbox":
+          if (!values[element.name]) {
             if (element.checked) {
-              values[element.name] = element.value;
+              values[element.name] =
+                element.value === "on" ? true : element.value;
             } else if (element.indeterminate) {
               values[element.name] = undefined;
+            } else {
+              values[element.name] = false;
             }
-            break;
-          case "select-multiple":
-            for (let j = 0; j < elementOptions.length; j += 1) {
-              if (elementOptions[j].selected) {
-                elementValues.push(elementOptions[j].value);
-              }
-            }
-            values[element.name] = elementValues;
-            if (element.validationMessage.length > 0) {
-              errors[element.name] = element.validationMessage;
-            }
-            break;
-          default:
-            values[element.name] = element.value;
-        }
-
-        // Override our value in case the user has supplied `data-valueasdate` or 'data-valueasnumber` attribute
-        // Important, valueAsNumber should always override valueAsDate
-        // see https://www.w3.org/TR/2011/WD-html5-20110405/common-input-element-attributes.html
-        if (element.hasAttribute("data-valueasdate")) {
-          if ("valueAsDate" in element) {
-            values[element.name] = element.valueAsDate;
           } else {
-            values[element.name] = new Date(element.value);
-          }
-        }
-        if (element.hasAttribute("data-valueasbool")) {
-          values[element.name] = (value => {
-            // Look for string values that if executed in eval would be falsey
-            if (typeof value === "string") {
-              const trimmed = value.trim();
-              if (
-                trimmed === "false" ||
-                trimmed === "" ||
-                trimmed === "0" ||
-                trimmed === "undefined" ||
-                trimmed === "null"
-              ) {
-                return false;
-              }
-              return true;
+            // Convert to an array of values since we're probably in a fieldset
+            // (Or at least, the user has declared multiple checkboxes with the same name)
+            if (!Array.isArray(values[element.name])) {
+              values[element.name] = new Array(values[element.name]);
             }
+            if (element.checked) {
+              values[element.name].push(element.value);
+            }
+          }
+          break;
+        case "radio":
+          if (element.checked) {
+            values[element.name] = element.value;
+          } else if (element.indeterminate) {
+            values[element.name] = undefined;
+          }
+          break;
+        case "select-multiple":
+          // Placeholders for select-multiple
+          const elementOptions = (element as HTMLSelectElement).options;
+          const elementValues = [];
+          for (let j = 0; j < elementOptions.length; j += 1) {
+            if (elementOptions[j].selected) {
+              elementValues.push(elementOptions[j].value);
+            }
+          }
+          values[element.name] = elementValues;
+          if (element.validationMessage.length > 0) {
+            errors[element.name] = element.validationMessage;
+          }
+          break;
+        default:
+          values[element.name] = element.value;
+      }
 
-            return !!value;
-          })(element.value);
+      // Override our value in case the user has supplied `data-valueasdate` or 'data-valueasnumber` attribute
+      // Important, valueAsNumber should always override valueAsDate
+      // see https://www.w3.org/TR/2011/WD-html5-20110405/common-input-element-attributes.html
+      if (element.hasAttribute("data-valueasdate")) {
+        if ("valueAsDate" in element) {
+          values[element.name] = element.valueAsDate;
+        } else {
+          values[element.name] = new Date(element.value);
         }
-        if (element.hasAttribute("data-valueasnumber")) {
-          values[element.name] = element.valueAsNumber;
-        }
+      }
+      if (element.hasAttribute("data-valueasbool")) {
+        values[element.name] = (value => {
+          // Look for string values that if executed in eval would be falsey
+          if (typeof value === "string") {
+            const trimmed = value.trim();
+            if (
+              trimmed === "false" ||
+              trimmed === "" ||
+              trimmed === "0" ||
+              trimmed === "undefined" ||
+              trimmed === "null"
+            ) {
+              return false;
+            }
+            return true;
+          }
+
+          return !!value;
+        })(element.value);
+      }
+      if (element.hasAttribute("data-valueasnumber")) {
+        values[element.name] = element.valueAsNumber;
       }
 
       // Save the error message
