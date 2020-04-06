@@ -123,6 +123,66 @@ test("validateOnBlur", async done => {
   done();
 });
 
+test("Focus the first element with an error", async done => {
+  const { getByLabelText, getByText } = render(
+    <Form onSubmit={event => event.preventDefault()}>
+      <label htmlFor="A">
+        A
+        <input id="A" name="A" type="text" pattern="^[a-f0-9]$" />
+      </label>
+      <label htmlFor="B">
+        B
+        <input id="B" name="B" type="text" pattern="^[a-f0-9]$" />
+      </label>
+
+      <button type="submit">Submit</button>
+    </Form>
+  );
+
+  const inputA = getByLabelText("A");
+  const inputB = getByLabelText("B");
+  const submit = getByText("Submit");
+
+  await userEvent.type(inputA, "boboddy");
+  await userEvent.type(inputB, "boboddy");
+  await userEvent.click(submit);
+
+  expect(inputA).toBe(document.activeElement);
+
+  done();
+});
+
+test("domValidation is overriden by validateOnChange", async done => {
+  const { getByLabelText } = render(
+    <Form
+      domValidation
+      onSubmit={event => event.preventDefault()}
+      validateOnChange={{
+        [NAME]: value => (REGEXP.test(value) ? "" : "validateOnChange")
+      }}
+    >
+      <label htmlFor={NAME}>
+        Input here
+        <input
+          id={NAME}
+          name={NAME}
+          type="text"
+          pattern={REGEXP.toString()}
+          data-errormessage="data-errormessage"
+        />
+      </label>
+    </Form>
+  );
+
+  const input = getByLabelText(/input here/i);
+
+  await userEvent.type(input, "boboddy");
+
+  expect(input.validationMessage).toBe("validateOnChange");
+
+  done();
+});
+
 /** @FIXME
  * Validation is intentionally fired after reset but not on mount...
  * Is this an intentional feature, or an oversight?
