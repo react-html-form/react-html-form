@@ -28,7 +28,7 @@ function StateContainer({ children }) {
  * it should work be made to work in refactoring tho.
  * https://github.com/ewolfe/react-html-form/blob/ae0a016ec2cc86026f5c6d9f9fbc385595d60651/src/index.js
  */
-test.todo("Reset removes dynamic fields from state", async done => {
+test.skip("Reset removes dynamic fields from state", async done => {
   const handleData = (_e, state) => {
     try {
       if (!state.values[PASSWORD] && state.values[USERNAME]) dataReader();
