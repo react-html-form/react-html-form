@@ -187,7 +187,8 @@ test("domValidation is overriden by validateOnChange", async done => {
  * Validation is intentionally fired after reset but not on mount...
  * Is this an intentional feature, or an oversight?
  */
-xtest("Reset form", async done => {
+// eslint-disable-next-line jest/no-disabled-tests
+test.skip("Reset form", async done => {
   function FormStateManager(props) {
     const [error, setError] = React.useState("");
     const handleData = state => {

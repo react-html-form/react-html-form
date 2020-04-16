@@ -28,6 +28,7 @@ function StateContainer({ children }) {
  * it should work be made to work in refactoring tho.
  * https://github.com/ewolfe/react-html-form/blob/ae0a016ec2cc86026f5c6d9f9fbc385595d60651/src/index.js
  */
+// eslint-disable-next-line jest/no-disabled-tests
 test.skip("Reset removes dynamic fields from state", async done => {
   const handleData = (_e, state) => {
     try {
