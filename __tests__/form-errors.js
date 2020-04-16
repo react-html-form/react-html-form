@@ -51,8 +51,45 @@ test("HTMLElement constraints cause form error", async done => {
   done();
 });
 
+test("validateOnChange with domValidation", async done => {
+  const handleData = (_e, state) => {
+    try {
+      if (state.errors[NAME]) dataReader(state.errors[NAME]);
+    } catch (error) {
+      // drop it
+    }
+  };
+
+  const { getByLabelText } = render(
+    <Form
+      domValidation
+      onReset={handleReset}
+      onChangeWithData={handleData}
+      validateOnChange={{
+        [NAME]: value => (REGEXP.test(value) ? "" : ERROR_MESSAGE)
+      }}
+    >
+      <label htmlFor={NAME}>
+        Input here
+        <input id={NAME} name={NAME} type="text" />
+      </label>
+    </Form>
+  );
+
+  const input = getByLabelText(/input here/i);
+  expect(input.value).toBe("");
+
+  await fireEvent.focus(input);
+  await userEvent.type(input, USER_INPUT);
+  await fireEvent.blur(input);
+
+  expect(input.validationMessage).toBe(ERROR_MESSAGE);
+
+  done();
+});
+
 test("validateOnChange", async done => {
-  const handleData = state => {
+  const handleData = (_e, state) => {
     try {
       if (state.errors[NAME]) dataReader(state.errors[NAME]);
     } catch (error) {
@@ -63,7 +100,7 @@ test("validateOnChange", async done => {
   const { getByLabelText } = render(
     <Form
       onReset={handleReset}
-      onData={handleData}
+      onChangeWithData={handleData}
       validateOnChange={{
         [NAME]: value => (REGEXP.test(value) ? "" : ERROR_MESSAGE)
       }}
@@ -83,6 +120,42 @@ test("validateOnChange", async done => {
   await fireEvent.blur(input);
 
   expect(dataReader).toHaveBeenCalled();
+
+  done();
+});
+
+test("validateOnBlur with domValidation", async done => {
+  const handleData = state => {
+    try {
+      if (state.errors[NAME]) dataReader(state.errors[NAME]);
+    } catch (error) {
+      // drop it
+    }
+  };
+
+  const { getByLabelText } = render(
+    <Form
+      domValidation
+      onData={handleData}
+      validateOnBlur={{
+        [NAME]: value => (REGEXP.test(value) ? "" : ERROR_MESSAGE)
+      }}
+    >
+      <label htmlFor={NAME}>
+        Input here
+        <input id={NAME} name={NAME} type="text" />
+      </label>
+    </Form>
+  );
+
+  const input = getByLabelText(/input here/i);
+  expect(input.value).toBe("");
+
+  await fireEvent.focus(input);
+  await userEvent.type(input, USER_INPUT);
+  await fireEvent.blur(input);
+
+  expect(input.validationMessage).toBe(ERROR_MESSAGE);
 
   done();
 });
