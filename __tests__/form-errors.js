@@ -51,8 +51,45 @@ test("HTMLElement constraints cause form error", async done => {
   done();
 });
 
+test("validateOnChange with domValidation", async done => {
+  const handleData = (_e, state) => {
+    try {
+      if (state.errors[NAME]) dataReader(state.errors[NAME]);
+    } catch (error) {
+      // drop it
+    }
+  };
+
+  const { getByLabelText } = render(
+    <Form
+      domValidation
+      onReset={handleReset}
+      onChangeWithData={handleData}
+      validateOnChange={{
+        [NAME]: value => (REGEXP.test(value) ? "" : ERROR_MESSAGE)
+      }}
+    >
+      <label htmlFor={NAME}>
+        Input here
+        <input id={NAME} name={NAME} type="text" />
+      </label>
+    </Form>
+  );
+
+  const input = getByLabelText(/input here/i);
+  expect(input.value).toBe("");
+
+  await fireEvent.focus(input);
+  await userEvent.type(input, USER_INPUT);
+  await fireEvent.blur(input);
+
+  expect(input.validationMessage).toBe(ERROR_MESSAGE);
+
+  done();
+});
+
 test("validateOnChange", async done => {
-  const handleData = state => {
+  const handleData = (_e, state) => {
     try {
       if (state.errors[NAME]) dataReader(state.errors[NAME]);
     } catch (error) {
@@ -63,7 +100,7 @@ test("validateOnChange", async done => {
   const { getByLabelText } = render(
     <Form
       onReset={handleReset}
-      onData={handleData}
+      onChangeWithData={handleData}
       validateOnChange={{
         [NAME]: value => (REGEXP.test(value) ? "" : ERROR_MESSAGE)
       }}
@@ -83,6 +120,42 @@ test("validateOnChange", async done => {
   await fireEvent.blur(input);
 
   expect(dataReader).toHaveBeenCalled();
+
+  done();
+});
+
+test("validateOnBlur with domValidation", async done => {
+  const handleData = state => {
+    try {
+      if (state.errors[NAME]) dataReader(state.errors[NAME]);
+    } catch (error) {
+      // drop it
+    }
+  };
+
+  const { getByLabelText } = render(
+    <Form
+      domValidation
+      onData={handleData}
+      validateOnBlur={{
+        [NAME]: value => (REGEXP.test(value) ? "" : ERROR_MESSAGE)
+      }}
+    >
+      <label htmlFor={NAME}>
+        Input here
+        <input id={NAME} name={NAME} type="text" />
+      </label>
+    </Form>
+  );
+
+  const input = getByLabelText(/input here/i);
+  expect(input.value).toBe("");
+
+  await fireEvent.focus(input);
+  await userEvent.type(input, USER_INPUT);
+  await fireEvent.blur(input);
+
+  expect(input.validationMessage).toBe(ERROR_MESSAGE);
 
   done();
 });
@@ -123,11 +196,72 @@ test("validateOnBlur", async done => {
   done();
 });
 
+test("Focus the first element with an error", async done => {
+  const { getByLabelText, getByText } = render(
+    <Form onSubmit={event => event.preventDefault()}>
+      <label htmlFor="A">
+        A
+        <input id="A" name="A" type="text" pattern="^[a-f0-9]$" />
+      </label>
+      <label htmlFor="B">
+        B
+        <input id="B" name="B" type="text" pattern="^[a-f0-9]$" />
+      </label>
+
+      <button type="submit">Submit</button>
+    </Form>
+  );
+
+  const inputA = getByLabelText("A");
+  const inputB = getByLabelText("B");
+  const submit = getByText("Submit");
+
+  await userEvent.type(inputA, "boboddy");
+  await userEvent.type(inputB, "boboddy");
+  await userEvent.click(submit);
+
+  expect(inputA).toBe(document.activeElement);
+
+  done();
+});
+
+test("domValidation is overriden by validateOnChange", async done => {
+  const { getByLabelText } = render(
+    <Form
+      domValidation
+      onSubmit={event => event.preventDefault()}
+      validateOnChange={{
+        [NAME]: value => (REGEXP.test(value) ? "" : "validateOnChange")
+      }}
+    >
+      <label htmlFor={NAME}>
+        Input here
+        <input
+          id={NAME}
+          name={NAME}
+          type="text"
+          pattern={REGEXP.toString()}
+          data-errormessage="data-errormessage"
+        />
+      </label>
+    </Form>
+  );
+
+  const input = getByLabelText(/input here/i);
+
+  await userEvent.type(input, "boboddy");
+
+  expect(input.validationMessage).toBe("validateOnChange");
+
+  done();
+});
+
 /** @FIXME
  * Validation is intentionally fired after reset but not on mount...
  * Is this an intentional feature, or an oversight?
  */
-xtest("Reset form", async done => {
+// eslint-disable-next-line jest/no-disabled-tests
+test.skip("Reset form", async done => {
   function FormStateManager(props) {
     const [error, setError] = React.useState("");
     const handleData = state => {

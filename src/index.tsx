@@ -226,6 +226,11 @@ class Form extends React.PureComponent<FormProps> {
           return !!value;
         })(element.value);
       }
+
+      /** @fixme
+       * @test @todo to ensure new elements don't sneak in
+       * @see __tests__/compatibility/sneaky-field.js
+       */
       if (
         element instanceof HTMLInputElement &&
         element.hasAttribute("data-valueasnumber")
