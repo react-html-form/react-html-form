@@ -52,6 +52,10 @@ class Form extends React.PureComponent {
 
           // If the input wasn't there when we rendered the component
           // we remove it from the values object
+          /** @fixme
+           * @test @todo to ensure new elements don't sneak in
+           * @see __tests__/compatibility/sneaky-field.js
+           */
           if (
             !Object.prototype.hasOwnProperty.call(this.values, element.name)
           ) {
