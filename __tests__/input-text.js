@@ -1,7 +1,7 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import Form from "../src/index.tsx";
+import Form from "../src/index";
 
 const NAME = "input";
 const USER_INPUT = "Hey there!";

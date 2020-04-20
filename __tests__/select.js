@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import Form from "../src/index.tsx";
+import Form from "../src/index";
 
 const NAME = "select";
 const BEER = "beer";

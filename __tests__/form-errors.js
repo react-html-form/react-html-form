@@ -6,7 +6,7 @@ import {
   waitForElementToBeRemoved
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import Form from "../src/index.tsx";
+import Form from "../src/index";
 
 const NAME = "input";
 const ERROR_MESSAGE = "Not a color";
