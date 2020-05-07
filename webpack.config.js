@@ -7,7 +7,8 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
     filename: "react-html-form.js",
     library: "react-html-form",
-    libraryTarget: "umd"
+    libraryTarget: "umd",
+    globalObject: "this"
   },
   externals: {
     react: {

@@ -5,7 +5,7 @@
     "declaration": true,
     "noImplicitAny": true,
     "allowSyntheticDefaultImports": true,
-    "module": "es6",
+    "module": "umd",
     "target": "es5",
     "jsx": "react",
     "allowJs": true,
