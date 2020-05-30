@@ -35,6 +35,7 @@
       },
       "plugins": ["react", "jest"],
       "rules": {
+        "import/extensions": [1, { "tsx": "never" }, { "ts": "never" }],
         "react/prop-types": 0,
         "jest/no-disabled-tests": 1,
         "jest/no-focused-tests": 2,

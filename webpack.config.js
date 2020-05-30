@@ -1,12 +1,14 @@
 const path = require("path");
 
 module.exports = {
-  entry: "./src/index.js",
+  entry: "./src/index.tsx",
+  resolve: { extensions: [".js", ".jsx", ".ts", "tsx"] },
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "react-html-form.js",
     library: "react-html-form",
-    libraryTarget: "umd"
+    libraryTarget: "umd",
+    globalObject: "this"
   },
   externals: {
     react: {
@@ -17,6 +19,8 @@ module.exports = {
     }
   },
   module: {
-    rules: [{ test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" }]
+    rules: [
+      { test: /\.[tj]sx?$/, exclude: /node_modules/, loader: "ts-loader" }
+    ]
   }
 };
