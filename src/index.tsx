@@ -10,7 +10,21 @@ type FieldValue =
   | string[]
   | { value: string; files: string[] };
 
+type Validator = (value: FieldValue) => string | Promise<string>;
+
 type Dictionary<T> = Record<string, T>;
+
+type Data = {
+  values: Dictionary<FieldValue>;
+  errors: Dictionary<string>;
+  blurred: Dictionary<boolean>;
+  touched: Dictionary<boolean>;
+  dirty: Dictionary<boolean>;
+  isValidating: boolean;
+  isDirty: boolean;
+  isValid: boolean;
+  submitCount: number;
+};
 
 type FormProps = {
   onBlur: (event: FocusEvent) => void;
@@ -20,7 +34,7 @@ type FormProps = {
     formState: any,
     form: HTMLFormElement
   ) => void;
-  onData: (formState: any, form: HTMLFormElement) => void;
+  onData: (formState: Data, form: HTMLFormElement) => void;
   onFocus: (event: FocusEvent) => void;
   onReset: (event: FormEvent) => void;
   onResetWithData: (
@@ -36,12 +50,8 @@ type FormProps = {
   ) => void;
 } & {
   domValidation: boolean;
-  validateOnBlur: {
-    [name: string]: (value: FieldValue) => string | Promise<string>;
-  };
-  validateOnChange: {
-    [name: string]: (value: FieldValue) => string | Promise<string>;
-  };
+  validateOnBlur: Dictionary<undefined | Validator>;
+  validateOnChange: Dictionary<undefined | Validator>;
 };
 
 class Form extends React.PureComponent<FormProps> {
@@ -77,12 +87,13 @@ class Form extends React.PureComponent<FormProps> {
   };
 
   submitCount = 0;
-  values: Dictionary<FieldValue> = {};
-  blurred: Dictionary<boolean> = {};
-  dirty: Dictionary<boolean> = {};
-  touched: Dictionary<boolean> = {};
-  isValidating = false;
-  form: HTMLFormElement;
+
+  private values: Dictionary<FieldValue> = {};
+  private blurred: Dictionary<boolean> = {};
+  private dirty: Dictionary<boolean> = {};
+  private touched: Dictionary<boolean> = {};
+  private isValidating = false;
+  private form: HTMLFormElement;
 
   componentDidMount() {
     const formState = this.getFormState();
@@ -93,7 +104,7 @@ class Form extends React.PureComponent<FormProps> {
   getFormState = ({
     resetting,
     submitting
-  }: { resetting?: boolean; submitting?: boolean } = {}) => {
+  }: { resetting?: boolean; submitting?: boolean } = {}): Data => {
     const values: Dictionary<FieldValue> = {};
     const errors: Dictionary<string> = {};
 
@@ -293,6 +304,7 @@ class Form extends React.PureComponent<FormProps> {
     return {
       values,
       errors,
+      blurred: this.blurred,
       dirty: this.dirty,
       touched: this.touched,
       isValidating: this.isValidating,
@@ -444,3 +456,33 @@ export const defaultFormState = {
   isValidating: false,
   submitCount: 0
 };
+
+/**
+ * @todo
+ * handlers to be used on a per-input level
+ *
+  handleTextInput = (field: HTMLInputElement, validator?: Validator) => {};
+  handleFileInput = (field: HTMLInputElement, validator?: Validator) => {
+    field.setCustomValidity("");
+
+    this.values[field.name] = {
+      value: field.value,
+      files: Array.from(field.files).map(file => file.name)
+    };
+
+    if (validator)
+      pact(validator(field.value)).then((message: string) => {
+        field.setCustomValidity(message);
+      });
+  };
+  handleRadioInput = (field: HTMLInputElement, validator?: Validator) => {};
+  handleCheckboxInput = (field: HTMLInputElement, validator?: Validator) => {};
+  handleSelectMultipe = (field: HTMLInputElement, validator?: Validator) => {};
+  handleUnknown = (field: HTMLInputElement, validateOnBlur?: Validator) => {};
+*/
+/** handles non-promises synchronously * /
+function pact<T>(promising: Promise<T> | T): any {
+  if (promising instanceof Promise) return promising;
+  else return { then: (cb: (t: T) => any) => cb(promising) };
+}
+*/
