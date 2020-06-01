@@ -117,11 +117,11 @@ class Form extends React.PureComponent<FormProps> {
       // element's without name's cannot be stored
       if (!element.name) continue;
 
-      // Reset to a blank state
-      element.setCustomValidity("");
-
       // Piggy back off this for-loop when calling onReset
       if (resetting) {
+        // Reset to a blank state
+        element.setCustomValidity("");
+
         // Set the value to the original value when the component was mounted
         if (this.values[element.name]) {
           /** @fixme this should be behind a guard for HTMLInputElement */
