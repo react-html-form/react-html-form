@@ -87,6 +87,7 @@ class Form extends React.PureComponent<FormProps> {
   };
 
   private form: HTMLFormElement = null;
+  private defaultValues: Data["values"] = {};
   private values: Data["values"] = {};
   private errors: Data["errors"] = {};
   private blurred: Data["blurred"] = {};
@@ -99,9 +100,29 @@ class Form extends React.PureComponent<FormProps> {
 
   componentDidMount() {
     const formState = this.getFormState();
+    this.defaultValues = formState.values;
     this.values = formState.values;
     this.props.onData(formState, this.form);
   }
+
+  handleTextInput = (field: HTMLInputElement, validator?: Validator) => {};
+  handleFileInput = (field: HTMLInputElement, validator?: Validator) => {
+    field.setCustomValidity("");
+
+    this.values[field.name] = {
+      value: field.value,
+      files: Array.from(field.files).map(file => file.name)
+    };
+
+    if (validator)
+      pact(validator(field.value)).then((message: string) => {
+        field.setCustomValidity(message);
+      });
+  };
+  handleRadioInput = (field: HTMLInputElement, validator?: Validator) => {};
+  handleCheckboxInput = (field: HTMLInputElement, validator?: Validator) => {};
+  handleSelectMultipe = (field: HTMLInputElement, validator?: Validator) => {};
+  handleUnknown = (field: HTMLInputElement, validateOnBlur?: Validator) => {};
 
   getFormState = ({
     resetting,
@@ -125,9 +146,8 @@ class Form extends React.PureComponent<FormProps> {
         // Set the value to the original value when the component was mounted
         if (this.values[element.name]) {
           /** @fixme this should be behind a guard for HTMLInputElement */
-          (element as HTMLInputElement).defaultValue = this.values[
-            element.name
-          ] as string;
+          this.values[element.name] =
+            (element as HTMLInputElement).defaultValue || "";
           element.checkValidity(); // recheck the validity, order here is important
         }
 
@@ -136,6 +156,12 @@ class Form extends React.PureComponent<FormProps> {
         if (!Object.prototype.hasOwnProperty.call(this.values, element.name)) {
           delete this.values[element.name];
         }
+
+        delete this.errors[element.name];
+        delete this.dirty[element.name];
+        delete this.touched[element.name];
+        delete this.blurred[element.name];
+        continue;
       }
 
       switch (element.type) {
@@ -288,6 +314,7 @@ class Form extends React.PureComponent<FormProps> {
           }
           this.errors[element.name] = errorMessage;
         } else {
+          this.errors[element.name] = "";
           element.setCustomValidity("");
         }
       }
@@ -297,7 +324,7 @@ class Form extends React.PureComponent<FormProps> {
     if (!this.values) {
       isDirty = false; // not dirty on first load
     } else {
-      isDirty = resetting ? false : !isEqual(this.values, this.values);
+      isDirty = resetting ? false : !isEqual(this.values, this.defaultValues);
     }
 
     return {
@@ -453,28 +480,10 @@ export const defaultFormState = {
  * @todo
  * handlers to be used on a per-input level
  *
-  handleTextInput = (field: HTMLInputElement, validator?: Validator) => {};
-  handleFileInput = (field: HTMLInputElement, validator?: Validator) => {
-    field.setCustomValidity("");
-
-    this.values[field.name] = {
-      value: field.value,
-      files: Array.from(field.files).map(file => file.name)
-    };
-
-    if (validator)
-      pact(validator(field.value)).then((message: string) => {
-        field.setCustomValidity(message);
-      });
-  };
-  handleRadioInput = (field: HTMLInputElement, validator?: Validator) => {};
-  handleCheckboxInput = (field: HTMLInputElement, validator?: Validator) => {};
-  handleSelectMultipe = (field: HTMLInputElement, validator?: Validator) => {};
-  handleUnknown = (field: HTMLInputElement, validateOnBlur?: Validator) => {};
-*/
-/** handles non-promises synchronously * /
+ */
+/** handles non-promises synchronously */
 function pact<T>(promising: Promise<T> | T): any {
   if (promising instanceof Promise) return promising;
   else return { then: (cb: (t: T) => any) => cb(promising) };
 }
-*/
+// */
