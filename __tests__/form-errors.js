@@ -19,11 +19,7 @@ beforeEach(() => {
 
 test("HTMLElement constraints cause form error", async done => {
   const handleData = state => {
-    try {
-      if (state.errors[NAME]) dataReader(state.errors[NAME]);
-    } catch (error) {
-      // drop it
-    }
+    if (state.errors[NAME]) dataReader(state.errors[NAME]);
   };
 
   const { getByLabelText } = render(
@@ -49,11 +45,7 @@ test("HTMLElement constraints cause form error", async done => {
 
 test("validateOnChange with domValidation", async done => {
   const handleData = (_e, state) => {
-    try {
-      if (state.errors[NAME]) dataReader(state.errors[NAME]);
-    } catch (error) {
-      // drop it
-    }
+    if (state.errors[NAME]) dataReader(state.errors[NAME]);
   };
 
   const { getByLabelText } = render(
@@ -86,11 +78,7 @@ test("validateOnChange with domValidation", async done => {
 
 test("validateOnChange", async done => {
   const handleData = (_e, state) => {
-    try {
-      if (state.errors[NAME]) dataReader(state.errors[NAME]);
-    } catch (error) {
-      // drop it
-    }
+    if (state.errors[NAME]) dataReader(state.errors[NAME]);
   };
 
   const { getByLabelText } = render(
@@ -122,11 +110,7 @@ test("validateOnChange", async done => {
 
 test("validateOnBlur with domValidation", async done => {
   const handleData = state => {
-    try {
-      if (state.errors[NAME]) dataReader(state.errors[NAME]);
-    } catch (error) {
-      // drop it
-    }
+    if (state.errors[NAME]) dataReader(state.errors[NAME]);
   };
 
   const { getByLabelText } = render(
@@ -158,11 +142,7 @@ test("validateOnBlur with domValidation", async done => {
 
 test("validateOnBlur", async done => {
   const handleData = state => {
-    try {
-      if (state.errors[NAME]) dataReader(state.errors[NAME]);
-    } catch (error) {
-      // drop it
-    }
+    if (state.errors[NAME]) dataReader(state.errors[NAME]);
   };
 
   const { getByLabelText } = render(
@@ -262,11 +242,7 @@ test("Reset form", async done => {
   function FormStateManager(props) {
     const [error, setError] = React.useState("");
     const handleData = state => {
-      try {
-        setError(state.errors[NAME]);
-      } catch (e) {
-        // do nothing
-      }
+      setError(state.errors[NAME]);
     };
 
     return props.children(error, handleData);

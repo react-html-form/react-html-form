@@ -20,12 +20,8 @@ beforeEach(() => {
 
 test("Ignores unnamed fields", async done => {
   const handleData = (_e, state) => {
-    try {
-      if (state.values[NAME_1]) dataReader(NAME_1);
-      if (state.values[NAME_2]) dataReader(NAME_2);
-    } catch (error) {
-      // drop it
-    }
+    if (state.values[NAME_1]) dataReader(NAME_1);
+    if (state.values[NAME_2]) dataReader(NAME_2);
   };
 
   const { getByLabelText, getByText } = render(

@@ -19,12 +19,7 @@ beforeEach(() => {
 
 test("Checkbox Input", async done => {
   const handleData = state => {
-    try {
-      // HANDLE CHANGE
-      dataReader(state.values[NAME]);
-    } catch (error) {
-      // drop it
-    }
+    dataReader(state.values[NAME]);
   };
 
   const { getByLabelText } = render(
@@ -64,13 +59,8 @@ test("Checkbox Input Group", async done => {
   const PACT_4 = "Wait… I take it all back";
 
   const handleData = state => {
-    try {
-      // HANDLE CHANGE
-      if (Array.isArray(state.values[NAME])) dataReader(state.values[NAME]);
-      else dataReader(state.values[NAME]);
-    } catch (error) {
-      // drop it
-    }
+    if (Array.isArray(state.values[NAME])) dataReader(state.values[NAME]);
+    else dataReader(state.values[NAME]);
   };
 
   const { getByLabelText } = render(

@@ -16,12 +16,8 @@ beforeEach(() => {
 
 test("Dirty handling", async done => {
   const handleData = state => {
-    try {
-      if (state.dirty[NAME]) dataReader(SET);
-      else dataReader(UNSET);
-    } catch (error) {
-      // drop it
-    }
+    if (state.dirty[NAME]) dataReader(SET);
+    else dataReader(UNSET);
   };
 
   const { getByLabelText, getByText } = render(
