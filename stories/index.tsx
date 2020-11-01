@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { storiesOf } from "@storybook/react";
-import Form, { defaultFormState } from "../src";
+import Form, { defaultFormState } from "../src/index";
 
 class KitchenSink extends React.Component {
   constructor(props) {
