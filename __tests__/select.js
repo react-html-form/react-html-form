@@ -20,12 +20,7 @@ beforeEach(() => {
 
 test("Select Input", done => {
   const handleData = state => {
-    try {
-      // HANDLE CHANGE
-      dataReader(state.values[NAME]);
-    } catch (error) {
-      // drop it
-    }
+    dataReader(state.values[NAME]);
   };
 
   const { getByLabelText } = render(
@@ -62,12 +57,7 @@ test("Select Input", done => {
 
 test("Select Multiple Input", done => {
   const handleData = state => {
-    try {
-      // HANDLE CHANGE
-      dataReader(state.values[NAME]);
-    } catch (error) {
-      // drop it
-    }
+    dataReader(state.values[NAME]);
   };
 
   const { getByLabelText } = render(

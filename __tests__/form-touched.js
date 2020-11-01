@@ -13,12 +13,8 @@ beforeEach(() => {
 
 test("Focus handling", async done => {
   const handleData = state => {
-    try {
-      if (state.touched[NAME]) dataReader("TOUCHED");
-      else dataReader("UNTOUCHED");
-    } catch (error) {
-      // drop it
-    }
+    if (state.touched[NAME]) dataReader("TOUCHED");
+    else dataReader("UNTOUCHED");
   };
 
   const { getByLabelText, getByText } = render(

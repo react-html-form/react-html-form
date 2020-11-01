@@ -31,11 +31,7 @@ function StateContainer({ children }) {
 // eslint-disable-next-line jest/no-disabled-tests
 test.skip("Reset removes dynamic fields from state", async done => {
   const handleData = (_e, state) => {
-    try {
-      if (!state.values[PASSWORD] && state.values[USERNAME]) dataReader();
-    } catch (error) {
-      // drop it
-    }
+    if (!state.values[PASSWORD] && state.values[USERNAME]) dataReader();
   };
 
   const { getByLabelText, getByText } = render(

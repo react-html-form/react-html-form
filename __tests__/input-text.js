@@ -19,11 +19,7 @@ beforeEach(() => {
 
 test("Uncontrolled Input", async done => {
   const handleData = state => {
-    try {
-      dataReader(state.values[NAME]);
-    } catch (error) {
-      // drop it
-    }
+    dataReader(state.values[NAME]);
   };
 
   const { getByLabelText } = render(

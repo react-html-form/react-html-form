@@ -23,12 +23,7 @@ test("Radio Input Group", async done => {
   const OPT_MAIL = "Mail";
 
   const handleData = state => {
-    try {
-      // HANDLE CHANGE
-      dataReader(state.values[NAME]);
-    } catch (error) {
-      // drop it
-    }
+    dataReader(state.values[NAME]);
   };
 
   const { getByLabelText } = render(

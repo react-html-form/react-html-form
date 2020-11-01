@@ -18,11 +18,7 @@ beforeEach(() => {
 
 test("File Input", async done => {
   const handleData = state => {
-    try {
-      dataReader(state.values[NAME].files[0].type);
-    } catch (error) {
-      // drop it
-    }
+    dataReader(state.values[NAME].files[0].type);
   };
 
   const FILE = new File(

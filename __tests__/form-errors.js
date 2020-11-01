@@ -1,10 +1,6 @@
 import React from "react";
-import {
-  render,
-  fireEvent,
-  waitForElement,
-  waitForElementToBeRemoved
-} from "@testing-library/react";
+import { act } from "react-dom/test-utils";
+import { render, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Form from "../src/index";
 
@@ -23,11 +19,7 @@ beforeEach(() => {
 
 test("HTMLElement constraints cause form error", async done => {
   const handleData = state => {
-    try {
-      if (state.errors[NAME]) dataReader(state.errors[NAME]);
-    } catch (error) {
-      // drop it
-    }
+    if (state.errors[NAME]) dataReader(state.errors[NAME]);
   };
 
   const { getByLabelText } = render(
@@ -53,11 +45,7 @@ test("HTMLElement constraints cause form error", async done => {
 
 test("validateOnChange with domValidation", async done => {
   const handleData = (_e, state) => {
-    try {
-      if (state.errors[NAME]) dataReader(state.errors[NAME]);
-    } catch (error) {
-      // drop it
-    }
+    if (state.errors[NAME]) dataReader(state.errors[NAME]);
   };
 
   const { getByLabelText } = render(
@@ -90,11 +78,7 @@ test("validateOnChange with domValidation", async done => {
 
 test("validateOnChange", async done => {
   const handleData = (_e, state) => {
-    try {
-      if (state.errors[NAME]) dataReader(state.errors[NAME]);
-    } catch (error) {
-      // drop it
-    }
+    if (state.errors[NAME]) dataReader(state.errors[NAME]);
   };
 
   const { getByLabelText } = render(
@@ -126,11 +110,7 @@ test("validateOnChange", async done => {
 
 test("validateOnBlur with domValidation", async done => {
   const handleData = state => {
-    try {
-      if (state.errors[NAME]) dataReader(state.errors[NAME]);
-    } catch (error) {
-      // drop it
-    }
+    if (state.errors[NAME]) dataReader(state.errors[NAME]);
   };
 
   const { getByLabelText } = render(
@@ -162,11 +142,7 @@ test("validateOnBlur with domValidation", async done => {
 
 test("validateOnBlur", async done => {
   const handleData = state => {
-    try {
-      if (state.errors[NAME]) dataReader(state.errors[NAME]);
-    } catch (error) {
-      // drop it
-    }
+    if (state.errors[NAME]) dataReader(state.errors[NAME]);
   };
 
   const { getByLabelText } = render(
@@ -261,20 +237,18 @@ test("domValidation is overriden by validateOnChange", async done => {
  * Is this an intentional feature, or an oversight?
  */
 // eslint-disable-next-line jest/no-disabled-tests
-test.skip("Reset form", async done => {
+test("Reset form", async done => {
+  jest.useFakeTimers(); // reset depends upon setTimeout
   function FormStateManager(props) {
     const [error, setError] = React.useState("");
     const handleData = state => {
-      try {
-        setError(state.errors[NAME]);
-      } catch (e) {
-        // do nothing
-      }
+      setError(state.errors[NAME]);
     };
 
     return props.children(error, handleData);
   }
-  const { getByLabelText, getByText } = render(
+
+  const { getByLabelText, queryByText } = render(
     <FormStateManager>
       {(error, handleData) => (
         <Form
@@ -302,10 +276,16 @@ test.skip("Reset form", async done => {
   await userEvent.type(input, USER_INPUT);
   await fireEvent.blur(input);
 
-  await waitForElement(() => getByText(ERROR_MESSAGE));
+  await queryByText(ERROR_MESSAGE);
 
-  await fireEvent.click(getByText("Reset"));
-  await waitForElementToBeRemoved(() => getByText(ERROR_MESSAGE));
+  await act(async () => {
+    await fireEvent.click(queryByText("Reset"));
+    await jest.runAllTimers();
+  });
+
+  await waitFor(async () => {
+    expect(queryByText(ERROR_MESSAGE)).toBeNull();
+  });
 
   done();
 });
